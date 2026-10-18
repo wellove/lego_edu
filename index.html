@@ -24,10 +24,10 @@
 
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
 .wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
 h1,h2,h3{font-family:var(--f-display);font-weight:400;text-wrap:balance;margin:0;line-height:1.2}
-h1{font-size:clamp(30px,6vw,46px)}
+h1{font-size:clamp(24px,4.5vw,32px)}
 h2{font-size:28px}
 h3{font-size:22px}
 p{margin:0}
@@ -52,6 +52,30 @@ header{display:flex;flex-direction:column;gap:14px}
 .unit .conv span{color:var(--muted)}
 .unit small{color:var(--muted);font-size:13px;line-height:1.5}
 
+.menu{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;max-width:1080px;margin:0 auto 30px;background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:0 0 16px 16px;box-shadow:0 10px 24px -14px rgba(16,40,64,.45);padding:12px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.menu .grp{display:flex;flex-wrap:wrap;align-items:center;gap:7px;min-width:0}
+.menu .lbl{font-size:11.5px;font-weight:700;letter-spacing:.1em;color:var(--muted);margin-right:2px}
+.menu{flex-wrap:nowrap;justify-content:space-between}
+.menu > .grp:first-child{flex:1 1 auto}
+.menu > .grp:last-child{flex:none;margin-left:auto;align-self:flex-start}
+.menu .sep{display:none}
+@media (max-width:560px){.menu{flex-wrap:wrap}}
+.menu .chip{background:var(--bg)}
+.menu .chip[aria-pressed="true"]{background:var(--ink)}
+.pgsel{position:relative;display:inline-flex}
+.pgsel select{appearance:none;-webkit-appearance:none;font:700 14px var(--f-body);color:var(--accent);background:var(--surface);border:1.5px solid var(--accent);border-radius:999px;padding:6px 34px 6px 14px;cursor:pointer}
+.pgsel select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.pgsel::after{content:"▾";position:absolute;right:13px;top:50%;transform:translateY(-52%);color:var(--accent);pointer-events:none;font-size:13px}
+.pgsel.on select{background:var(--accent);color:var(--surface)}
+.pgsel.on::after{color:var(--surface)}
+.pgsel option{color:var(--ink);background:var(--surface)}
+.nowbar{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);border-bottom:2px solid var(--line);padding-bottom:10px}
+.nowbar b{color:var(--ink);font-size:15px}
+.nowbar i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.chip.pg{border-style:dashed}
+.chip.pg[aria-pressed="true"]{border-style:solid}
+.titlebar{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px}
+.page,.pagecol{display:flex;flex-direction:column;gap:40px}
 .filters{display:flex;flex-wrap:wrap;gap:8px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 .chip{font:600 14px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
@@ -157,20 +181,21 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
+<nav class="menu" id="filters" aria-label="메뉴"></nav>
 <div class="wrap">
-<header>
-  <span class="eyebrow">LEGO SPIKE PRIME · 블록 코딩에서 파이썬으로</span>
-  <h1>스파이크 블록 ↔ 파이썬 대응표</h1>
-  <p class="lede">블록 하나는 파이썬 한 줄과 같은 일을 합니다. 왼쪽 블록을 보고 오른쪽 코드를 읽어 보세요. 기준은 SPIKE 앱 3 버전의 파이썬입니다.</p>
-  <nav class="toc" aria-label="바로가기"><a href="#units">단위 차이</a><a href="#table">대응표</a><a href="#ex">예제 모음</a><a href="#build">조합 만들기</a><a href="#quiz-sec">연습 문제</a></nav>
+<div class="nowbar" id="nowbar" aria-live="polite"></div>
+
+<div class="page" id="pg-read" hidden>
+<section class="cat">
+  <div><span class="eyebrow">처음 시작할 때</span><h2>읽어보세요</h2></div>
+  <p class="lede">블록 하나는 파이썬 한 줄과 같은 일을 합니다. 대응표에서 왼쪽 블록을 보고 오른쪽 코드를 읽어 보세요.</p>
   <div class="equation">
     <span class="blk rep se"><span class="ico" data-i="color"></span><span class="port">C ▾</span>반사광</span>
     <span class="eq">=</span>
     <code class="big" data-hl>color_sensor.reflection(port.C)</code>
     <p class="cap">C 포트에 연결된 컬러 센서가 받은 빛의 양을 0~100 사이 숫자로 알려줍니다. 둥근 블록(값 블록)은 파이썬에서 <b>값을 돌려주는 함수</b>가 됩니다.</p>
   </div>
-</header>
-
+</section>
 <section class="cat" id="units">
   <div><span class="eyebrow">먼저 읽기</span><h2>단위가 다른 곳 7가지</h2></div>
   <p class="muted">블록과 파이썬은 같은 일을 하지만 숫자의 단위가 다른 곳이 있어요. 블록 숫자를 그대로 옮기면 로봇이 다르게 움직입니다.</p>
@@ -184,22 +209,17 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
     <div class="unit"><b>기울기 각도</b><div class="conv">90 ° <span>→</span> 900</div><small>파이썬은 0.1도 단위라서 10으로 나눠야 블록 값과 같아집니다.</small></div>
   </div>
 </section>
-
 <section class="cat">
   <div><span class="eyebrow">모든 프로그램의 첫 줄</span><h2>불러오기(import)</h2></div>
   <p class="muted">블록은 팔레트에 이미 다 있지만, 파이썬은 쓸 도구를 맨 위에서 불러와야 합니다. 아래 줄을 복사해서 시작하면 이 표의 모든 코드를 쓸 수 있어요.</p>
   <div class="code"><pre data-hl>from hub import port, light_matrix, light, sound, button, motion_sensor
 import motor, motor_pair, color_sensor, distance_sensor, force_sensor
-import color, runloop, random</pre></div>
+import color, runloop, random, time</pre></div>
 </section>
+</div>
 
-<section class="cat" id="table">
-  <div><span class="eyebrow">블록 하나 = 파이썬 한 줄</span><h2>대응표</h2></div>
-</section>
-<nav class="filters" id="filters" aria-label="카테고리 고르기"></nav>
-<div id="cats" class="wrap" style="gap:36px"></div>
-
-<section class="cat" id="ex">
+<div class="page" id="pg-table"><div id="cats" class="pagecol"></div></div>
+<div class="page" id="pg-ex" hidden><section class="cat" id="ex">
   <div><span class="eyebrow">합쳐 보기</span><h2>예제 모음</h2></div>
   <p class="muted">센서·라이트·소리를 하나씩 써 보는 <b>기본 예제</b>와, 여러 개를 합친 <b>응용 예제</b>가 있어요. C자 블록 안에 들어간 블록은 파이썬의 <b>들여쓰기 4칸</b>과 같은 뜻입니다.</p>
   <div class="filters" id="exGroups" style="position:static" role="group" aria-label="예제 종류"></div>
@@ -207,9 +227,8 @@ import color, runloop, random</pre></div>
     <nav class="ex-list" id="exList" aria-label="예제 목록"></nav>
     <article class="card" id="exView" aria-live="polite"></article>
   </div>
-</section>
-
-<section class="cat" id="build">
+</section></div>
+<div class="page" id="pg-build" hidden><section class="cat" id="build">
   <div><span class="eyebrow">직접 만들기</span><h2>센서 + 출력 조합 만들기</h2></div>
   <p class="muted">센서 조건 하나와 출력을 고르면 블록 프로그램과 파이썬 코드가 함께 만들어집니다. 라이트와 소리를 같이 고르면 둘이 함께 작동해요.</p>
   <div class="builder">
@@ -220,12 +239,11 @@ import color, runloop, random</pre></div>
     </div>
     <article class="card" id="buildOut" aria-live="polite"></article>
   </div>
-</section>
-
-<section class="cat" id="quiz-sec">
+</section></div>
+<div class="page" id="pg-quiz" hidden><section class="cat" id="quiz-sec">
   <div><span class="eyebrow">직접 해보기</span><h2>블록을 파이썬으로 바꿔 보세요</h2></div>
   <div class="quiz" id="quiz"></div>
-</section>
+</section></div>
 
 <footer>SPIKE 앱 버전에 따라 블록에 적힌 한글 표현이 조금 다를 수 있습니다. 파이썬 코드는 SPIKE 앱 3의 파이썬(모듈 <code>motor</code>, <code>motor_pair</code>, <code>runloop</code> 등) 기준이며, 예전 SPIKE 2 파이썬(<code>from spike import ...</code>)과는 문법이 다릅니다. 가속률처럼 블록의 단계(느림·중간·빠름)를 숫자로 옮긴 값은 수업용 예시값이니 로봇에 맞게 조정하세요.</footer>
 </div>
@@ -292,6 +310,27 @@ const STOP=B('stack','mv','@move 이동 정지');
 const DATA=[
  {id:'event',name:'이벤트',color:'--c-event',desc:'노란 모자 블록은 파이썬에서 "언제 시작할지"를 정하는 틀입니다.',rows:[
   [HAT,'async def main():\n    # 여기에 코드를 씁니다\n\nrunloop.run(main())','모든 파이썬 프로그램의 기본 틀입니다. 블록 아래에 붙이는 내용이 main() 안으로 들어갑니다.'],
+  [B('hat','ev','@color{C} 색상이 <빨간색>(이)가 되면'),`async def main():
+    pass   # 프로그램이 시작되면 할 일
+
+async def when_red():                 # C 색상이 빨간색이 되면
+    while True:
+        await runloop.until(lambda: color_sensor.color(port.C) == color.RED)
+        light_matrix.show_image(light_matrix.IMAGE_HAPPY)   # 할 일
+        await runloop.until(lambda: color_sensor.color(port.C) != color.RED)
+
+runloop.run(main(), when_red())`,'"~하면" 모자 블록은 파이썬에서 따로 기다리는 함수가 됩니다. 조건이 될 때까지 기다렸다가 할 일을 하고, 조건이 풀릴 때까지 다시 기다려야 블록처럼 여러 번 작동해요. 마지막 줄 runloop.run() 에 함수 이름을 모두 넣으면 함께 실행됩니다. 아래 행부터는 이 틀에서 조건 줄만 바꿔 넣으면 됩니다.','star'],
+  [B('hat','ev','@color{C} 반사광이 <&lt;>[50]%(이)가 되면'),'await runloop.until(lambda: color_sensor.reflection(port.C) < 50)',''],
+  [B('hat','ev','@dist{D} 가 <&lt;>[15]<cm>보다 가까워지면'),'await runloop.until(lambda: 0 < distance_sensor.distance(port.D) < 150)','거리 센서는 mm 단위. 15cm = 150mm.','unit'],
+  [B('hat','ev','@force{E} 가 <눌리면>'),'await runloop.until(lambda: force_sensor.pressed(port.E))',''],
+  [B('hat','ev','@hub 허브가 <흔들리면>'),'await runloop.until(lambda: motion_sensor.gesture() == motion_sensor.SHAKEN)','다른 동작: TAPPED(톡 치기), DOUBLE_TAPPED(두 번 치기), FALLING(떨어짐).'],
+  [B('hat','ev','@hub 허브 <앞면>이 위를 향하면'),'await runloop.until(lambda: motion_sensor.up_face() == motion_sensor.FRONT)','면 이름: TOP, BOTTOM, FRONT, BACK, LEFT, RIGHT.'],
+  [B('hat','ev','@hub<왼쪽> 버튼이 <눌리면>'),'await runloop.until(lambda: button.pressed(button.LEFT) > 0)','오른쪽 버튼은 button.RIGHT.'],
+  [B('hat','ev','타이머가 [5]보다 크면'),'start = time.ticks_ms()   # 타이머 시작(초기화)\nawait runloop.until(lambda: time.ticks_diff(time.ticks_ms(), start) > 5000)','파이썬에는 타이머 블록이 없어서 시작 시각을 저장하고 지난 시간을 잽니다. import time 필요, 5초 = 5000ms.','unit'],
+  [B('hat','ev','⬡ 이(가) 참이 되면'),'await runloop.until(lambda: 조건)','육각형 블록 자리에 넣은 조건을 lambda: 뒤에 그대로 씁니다.'],
+  [B('hat','ev','<메시지1> 을(를) 받았을 때'),'async def message1():\n    # 메시지를 받았을 때 할 일','파이썬에는 방송 기능이 따로 없어서 "받았을 때" 블록을 함수로 만듭니다.'],
+  [B('stack','ev','<메시지1> 방송하고 기다리기'),'await message1()','방송 = 그 함수를 부르기. await 는 함수가 끝날 때까지 기다립니다.'],
+  [B('stack','ev','<메시지1> 방송하기'),'await message1()','블록의 "기다리지 않는 방송"은 파이썬으로 똑같이 옮기기 어려워서, 수업에서는 보통 기다리는 방식으로 씁니다.'],
  ]},
  {id:'motor',name:'모터',color:'--c-motor',desc:'모터 하나를 따로 움직일 때 씁니다.',rows:[
   [B('stack','mo','@motor{A}<시계 방향 ↻>으로 [1] <회전> 실행'),'await motor.run_for_degrees(port.A, 360, 720)','(포트, 각도, 속도). 1회전 = 360°. 반시계 방향은 각도를 -360으로 씁니다.','unit'],
@@ -668,17 +707,27 @@ document.addEventListener('click',async e=>{
 });
 
 const store={get(k,d){try{return localStorage.getItem(k)??d}catch{return d}},set(k,v){try{localStorage.setItem(k,v)}catch{}}};
-const fl=document.getElementById('filters');
-const all=[{id:'all',name:'전체'}].concat(DATA);
-fl.innerHTML=all.map(c=>`<button class="chip" type="button" id="chip-${c.id}" data-id="${c.id}" aria-pressed="false">${c.color?`<i style="background:var(${c.color})"></i>`:''}${c.name}</button>`).join('');
-function applyCat(id){
+const fl=document.getElementById('filters'),nowbar=document.getElementById('nowbar');
+const PAGES=[{id:'read',name:'읽어보세요'},{id:'ex',name:'예제 모음'},{id:'build',name:'조합 만들기'},{id:'quiz',name:'연습 문제'}];
+fl.innerHTML=`<div class="grp">`
+  +DATA.map(c=>`<button class="chip" type="button" id="chip-${c.id}" data-id="${c.id}" aria-pressed="false"><i style="background:var(${c.color})"></i>${c.name}</button>`).join('')
+  +`</div><span class="sep" aria-hidden="true"></span><div class="grp"><label class="pgsel" id="pgWrap"><select id="pgSel" aria-label="학습 자료 고르기"><option value="" disabled hidden>읽어보세요</option>`
+  +PAGES.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')+`</select></label></div>`;
+const pgSel=document.getElementById('pgSel'),pgWrap=document.getElementById('pgWrap');
+function go(id,scroll){
+  const pg=PAGES.find(p=>p.id===id), cat=DATA.find(c=>c.id===id);
   fl.querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.id===id));
-  cats.querySelectorAll('.cat').forEach(s=>s.hidden=!(id==='all'||s.dataset.cat===id));
-  store.set('spike-cat',id);
+  pgSel.value=pg?id:''; pgWrap.classList.toggle('on',!!pg);
+  document.querySelectorAll('.page').forEach(el=>el.hidden=el.id!==(pg?'pg-'+id:'pg-table'));
+  if(cat)cats.querySelectorAll('.cat').forEach(s=>s.hidden=s.dataset.cat!==id);
+  nowbar.innerHTML=pg?`지금 보는 곳 <b>학습 자료 · ${pg.name}</b>`:`지금 보는 곳 <i style="background:var(${cat.color})"></i><b>블록 대응표 · ${cat.name}</b>`;
+  store.set('spike-menu',id);
+  if(scroll)window.scrollTo({top:0});
 }
-fl.addEventListener('click',e=>{const b=e.target.closest('.chip');if(b)applyCat(b.dataset.id)});
-const savedCat=store.get('spike-cat','all');
-applyCat(DATA.some(d=>d.id===savedCat)?savedCat:'all');
+fl.addEventListener('click',e=>{const b=e.target.closest('.chip');if(b)go(b.dataset.id,true)});
+pgSel.addEventListener('change',()=>{if(pgSel.value)go(pgSel.value,true)});
+const savedMenu=store.get('spike-menu','event');
+go([...DATA,...PAGES].some(x=>x.id===savedMenu)?savedMenu:'event',false);
 
 /* ===== 예제 모음 ===== */
 const GROUPS=[{id:'basic',name:'기본 예제'},{id:'mix',name:'응용: 센서 합치기'}];
