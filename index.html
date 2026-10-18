@@ -1,0 +1,386 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>스파이크 블록·파이썬 대응표</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: 실습지 느낌의 한 칸 문서. 카테고리마다 [블록 | 파이썬] 두 칸 대응 행, 폰에서는 위아래로 쌓임 */
+:root{
+  --bg:#eef3f7; --surface:#ffffff; --ink:#15202b; --muted:#566676; --line:#d6e0e8;
+  --accent:#0a74c9; --warn:#b4530a; --warn-bg:#fff4e6;
+  --code-bg:#17212c; --code-ink:#dbe6f0; --code-kw:#ff8fc8; --code-fn:#7cc7ff; --code-num:#ffc861; --code-str:#9fe39a; --code-com:#7f93a6;
+  --f-display:"Do Hyeon","Noto Sans KR",system-ui,sans-serif;
+  --f-body:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;
+  --f-code:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  /* SPIKE 블록 카테고리 색 (테마와 무관하게 동일) */
+  --c-event:#e6a800; --c-motor:#0090f5; --c-move:#ff4ccd; --c-light:#9a6bff; --c-sound:#cf63cf;
+  --c-control:#f5a015; --c-sensor:#3db5df; --c-op:#4cb04c;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f151b; --surface:#172029; --ink:#e4ecf3; --muted:#93a3b2; --line:#283541;
+  --accent:#5db3f5; --warn:#ffb067; --warn-bg:#2b2117; --code-bg:#0a1016; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f151b; --surface:#172029; --ink:#e4ecf3; --muted:#93a3b2; --line:#283541;
+  --accent:#5db3f5; --warn:#ffb067; --warn-bg:#2b2117; --code-bg:#0a1016; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:36px}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:clamp(30px,6vw,46px)}
+h2{font-size:28px}
+h3{font-size:20px}
+p{margin:0}
+.eyebrow{font-size:12px;letter-spacing:.12em;font-weight:700;color:var(--accent)}
+.muted{color:var(--muted)}
+
+/* hero */
+header{display:flex;flex-direction:column;gap:14px}
+.lede{max-width:62ch;color:var(--muted)}
+.equation{display:flex;flex-wrap:wrap;align-items:center;gap:14px 18px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
+.equation .eq{font-family:var(--f-display);font-size:34px;color:var(--muted)}
+.equation code.big{font-family:var(--f-code);font-size:clamp(14px,2.6vw,19px);background:var(--code-bg);color:var(--code-ink);padding:10px 14px;border-radius:8px;overflow-x:auto;max-width:100%}
+.equation .cap{flex-basis:100%;font-size:14px;color:var(--muted)}
+
+/* 단위 차이 */
+.units{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.unit{background:var(--warn-bg);border:1px solid color-mix(in srgb,var(--warn) 30%,transparent);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.unit b{font-size:13px;color:var(--warn);letter-spacing:.04em}
+.unit .conv{font-family:var(--f-code);font-size:14px}
+.unit .conv span{color:var(--muted)}
+.unit small{color:var(--muted);font-size:13px;line-height:1.5}
+
+/* import */
+.imports{display:flex;flex-direction:column;gap:10px}
+
+/* 필터 */
+.filters{display:flex;flex-wrap:wrap;gap:8px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.chip{font:600 14px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.chip i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip:focus-visible,.copy:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* 카테고리 */
+.cat{display:flex;flex-direction:column;gap:12px}
+.cat-head{display:flex;align-items:center;gap:12px}
+.cat-head .sw{width:28px;height:28px;border-radius:7px;flex:none}
+.cat-head p{font-size:14px}
+.rows{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:10px 22px;padding:16px 18px;border-top:1px solid var(--line);align-items:center}
+.row:first-child{border-top:0}
+.row.star{background:color-mix(in srgb,var(--c-sensor) 9%,var(--surface))}
+.row .blk-cell{min-width:0}
+.row .note{grid-column:1/-1;font-size:13.5px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
+.tag{font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:5px;background:var(--warn-bg);color:var(--warn);white-space:nowrap}
+.tag.ok{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent)}
+@media (max-width:720px){.row{grid-template-columns:minmax(0,1fr)}}
+
+/* 코드 */
+.code{position:relative;min-width:0}
+.code pre{margin:0;background:var(--code-bg);color:var(--code-ink);font:13.5px/1.55 var(--f-code);padding:11px 44px 11px 14px;border-radius:8px;overflow-x:auto;tab-size:4}
+.copy{position:absolute;top:6px;right:6px;font:600 11px var(--f-body);background:rgba(255,255,255,.1);color:var(--code-ink);border:1px solid rgba(255,255,255,.18);border-radius:5px;padding:3px 7px;cursor:pointer}
+.copy:hover{background:rgba(255,255,255,.2)}
+.k{color:var(--code-kw)} .f{color:var(--code-fn)} .n{color:var(--code-num)} .s{color:var(--code-str)} .c{color:var(--code-com);font-style:italic}
+
+/* ===== SPIKE 블록 ===== */
+.blk{--b:var(--c-sensor);display:inline-flex;align-items:center;flex-wrap:wrap;gap:6px;background:var(--b);color:#fff;font:700 14px/1 var(--f-body);
+  padding:8px 12px;min-height:40px;border-radius:5px;position:relative;box-shadow:inset 0 -2px 0 rgba(0,0,0,.18);max-width:100%;text-shadow:0 1px 0 rgba(0,0,0,.12)}
+.blk.stack{margin-top:5px}
+.blk.stack::before{content:"";position:absolute;top:-5px;left:14px;width:22px;height:6px;background:var(--b);border-radius:3px 3px 0 0}
+.blk.hat{border-radius:22px 22px 5px 5px;padding-top:14px;min-height:50px}
+.blk.rep{border-radius:999px;padding:6px 14px 6px 6px}
+.blk.bool{clip-path:polygon(16px 0,calc(100% - 16px) 0,100% 50%,calc(100% - 16px) 100%,16px 100%,0 50%);padding:6px 22px;box-shadow:none}
+.blk .ico{width:28px;height:28px;border-radius:6px;background:rgba(255,255,255,.95);display:grid;place-items:center;flex:none}
+.blk .ico svg{width:20px;height:20px}
+.blk .port{background:#fff;color:#2a3540;border-radius:999px;padding:4px 9px;font-size:13px;text-shadow:none}
+.blk .num{background:#fff;color:#2a3540;border-radius:999px;padding:4px 10px;font-size:13px;min-width:30px;text-align:center;text-shadow:none}
+.blk .dd{background:rgba(0,0,0,.16);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:3px 10px;font-size:13px}
+.ev{--b:var(--c-event)} .mo{--b:var(--c-motor)} .mv{--b:var(--c-move)} .li{--b:var(--c-light)} .so{--b:var(--c-sound)}
+.co{--b:var(--c-control)} .se{--b:var(--c-sensor)} .op{--b:var(--c-op)}
+/* C자 블록 */
+.cblk{display:inline-flex;flex-direction:column;--b:var(--c-control);max-width:100%}
+.cblk .top{border-radius:5px 5px 0 5px}
+.cblk .mouth{display:flex;min-height:30px}
+.cblk .mouth::before{content:"";width:18px;background:var(--b)}
+.cblk .mouth span{flex:1;margin:4px 0 4px 6px;border:1.5px dashed var(--line);border-radius:5px;font-size:12px;color:var(--muted);padding:2px 8px;min-width:90px}
+.cblk .bot{height:16px;width:90px;background:var(--b);border-radius:0 5px 5px 5px;box-shadow:inset 0 -2px 0 rgba(0,0,0,.18)}
+.cblk .mid{border-radius:0 5px 5px 0;margin-top:0;width:fit-content}
+.cblk .top::before{display:none}
+
+/* 예제 프로그램 */
+.example{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:18px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+@media (max-width:760px){.example{grid-template-columns:minmax(0,1fr)}}
+.script{display:flex;flex-direction:column;align-items:flex-start;overflow-x:auto;padding-bottom:4px}
+.script .blk{margin-top:0;border-radius:0 5px 5px 5px}
+.script .blk.stack::before{top:-1px;opacity:0}
+.script .ind{padding-left:18px;border-left:18px solid var(--c-control);display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding-block:3px}
+.script .ind .ind{border-left-color:var(--c-control)}
+.script .cap{background:var(--c-control);height:14px;width:110px;border-radius:0 0 5px 5px}
+.script .gap{height:2px}
+.lines{font-size:13.5px;color:var(--muted);grid-column:1/-1;display:flex;flex-direction:column;gap:4px}
+
+/* 연습 */
+.quiz{display:flex;flex-direction:column;gap:12px}
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.qcard .q{display:flex;flex-direction:column;gap:10px}
+summary{cursor:pointer;font-weight:700;color:var(--accent);width:fit-content}
+details[open] summary{margin-bottom:10px}
+footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;max-width:70ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <span class="eyebrow">LEGO SPIKE PRIME · 블록 코딩에서 파이썬으로</span>
+  <h1>스파이크 블록 ↔ 파이썬 대응표</h1>
+  <p class="lede">블록 하나는 파이썬 한 줄과 같은 일을 합니다. 왼쪽 블록을 보고 오른쪽 코드를 읽어 보세요. 기준은 SPIKE 앱 3 버전의 파이썬입니다.</p>
+  <div class="equation">
+    <span class="blk rep se"><span class="ico" data-i="color"></span><span class="port">C ▾</span>반사광</span>
+    <span class="eq">=</span>
+    <code class="big" data-hl>color_sensor.reflection(port.C)</code>
+    <p class="cap">C 포트에 연결된 컬러 센서가 받은 빛의 양을 0~100 사이 숫자로 알려줍니다. 둥근 블록(값 블록)은 파이썬에서 <b>값을 돌려주는 함수</b>가 됩니다.</p>
+  </div>
+</header>
+
+<section class="cat">
+  <div><span class="eyebrow">먼저 읽기</span><h2>단위가 다른 곳 6가지</h2></div>
+  <p class="muted">블록과 파이썬은 같은 일을 하지만 숫자의 단위가 다른 곳이 있어요. 블록 숫자를 그대로 옮기면 로봇이 다르게 움직입니다.</p>
+  <div class="units">
+    <div class="unit"><b>시간</b><div class="conv">1 초 <span>→</span> 1000 ms</div><small>파이썬은 밀리초(1/1000초)를 씁니다.</small></div>
+    <div class="unit"><b>모터 속도</b><div class="conv">50 % <span>→</span> 약 500 °/s</div><small>파이썬은 초당 회전 각도(도/초). 대략 1%≈10°/s로 생각하세요.</small></div>
+    <div class="unit"><b>회전 수</b><div class="conv">1 회전 <span>→</span> 360 °</div><small>파이썬은 회전 수 대신 각도로 지정합니다.</small></div>
+    <div class="unit"><b>거리 센서</b><div class="conv">10 cm <span>→</span> 100 mm</div><small>파이썬은 mm로 알려주고, 아무것도 없으면 -1이 나옵니다.</small></div>
+    <div class="unit"><b>빛 매트릭스 좌표</b><div class="conv">1~5 <span>→</span> 0~4</div><small>파이썬은 0부터 셉니다. 블록 (1,1)은 파이썬 (0,0)입니다.</small></div>
+    <div class="unit"><b>기울기 각도</b><div class="conv">90 ° <span>→</span> 900</div><small>파이썬은 0.1도 단위라서 10으로 나눠야 블록 값과 같아집니다.</small></div>
+  </div>
+</section>
+
+<section class="cat imports">
+  <div><span class="eyebrow">모든 프로그램의 첫 줄</span><h2>불러오기(import)</h2></div>
+  <p class="muted">블록은 팔레트에 이미 다 있지만, 파이썬은 쓸 도구를 맨 위에서 불러와야 합니다. 아래 줄을 복사해서 시작하면 이 표의 모든 코드를 쓸 수 있어요.</p>
+  <div class="code"><pre data-hl>from hub import port, light_matrix, light, sound, button, motion_sensor
+import motor, motor_pair, color_sensor, distance_sensor, force_sensor
+import color, runloop, random</pre></div>
+</section>
+
+<nav class="filters" id="filters" aria-label="카테고리 고르기"></nav>
+
+<div id="cats" class="wrap" style="gap:36px"></div>
+
+<section class="cat" id="ex">
+  <div><span class="eyebrow">합쳐 보기</span><h2>예제: 검은 선 따라가기</h2></div>
+  <p class="muted">위의 블록들을 모으면 프로그램이 됩니다. 블록의 들여쓰기(C자 안에 들어간 블록)는 파이썬의 <b>들여쓰기 4칸</b>과 똑같은 뜻이에요.</p>
+  <div class="example">
+    <div class="script" aria-label="블록 프로그램">
+      <span class="blk hat ev">프로그램이 시작되면</span>
+      <span class="blk stack mv"><span class="ico" data-i="move"></span>이동 모터를 <span class="dd">A+B ▾</span>로 설정</span>
+      <span class="blk stack co" style="border-radius:0 5px 0 0">무한 반복하기</span>
+      <div class="ind">
+        <span class="blk stack co" style="border-radius:0 5px 0 0">만약 <span class="blk bool se" style="min-height:32px"><span class="port">C ▾</span>반사광 <span class="dd">&lt; ▾</span><span class="num">50</span>%?</span> 라면</span>
+        <div class="ind">
+          <span class="blk stack mv"><span class="ico" data-i="move"></span>왼쪽 <span class="num">20</span>% 오른쪽 <span class="num">50</span>%로 이동 시작</span>
+        </div>
+        <span class="blk stack co" style="border-radius:0 5px 0 0">아니면</span>
+        <div class="ind">
+          <span class="blk stack mv"><span class="ico" data-i="move"></span>왼쪽 <span class="num">50</span>% 오른쪽 <span class="num">20</span>%로 이동 시작</span>
+        </div>
+        <div class="cap" style="margin-left:-18px"></div>
+      </div>
+      <div class="cap"></div>
+    </div>
+    <div class="code"><pre data-hl>from hub import port
+import motor_pair, color_sensor, runloop
+
+async def main():                                  # 프로그램이 시작되면
+    motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
+    while True:                                    # 무한 반복하기
+        if color_sensor.reflection(port.C) &lt; 50:   # 만약 반사광 &lt; 50% 라면
+            motor_pair.move_tank(motor_pair.PAIR_1, 200, 500)
+        else:                                      # 아니면
+            motor_pair.move_tank(motor_pair.PAIR_1, 500, 200)
+        await runloop.sleep_ms(10)
+
+runloop.run(main())</pre></div>
+    <div class="lines">
+      <p>· 반사광이 50보다 작으면(검은 선 위) 왼쪽으로, 크면(흰 바탕) 오른쪽으로 꺾으며 선 가장자리를 따라갑니다.</p>
+      <p>· 마지막 <code>await runloop.sleep_ms(10)</code>은 블록에는 없지만 반복이 너무 빨리 돌지 않게 잠깐 쉬는 줄입니다.</p>
+    </div>
+  </div>
+</section>
+
+<section class="cat">
+  <div><span class="eyebrow">직접 해보기</span><h2>블록을 파이썬으로 바꿔 보세요</h2></div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<footer>SPIKE 앱 버전에 따라 블록에 적힌 한글 표현이 조금 다를 수 있습니다. 파이썬 코드는 SPIKE 앱 3의 파이썬(모듈 <code>motor</code>, <code>motor_pair</code>, <code>runloop</code> 등) 기준입니다. 예전 SPIKE 2 파이썬(<code>from spike import ...</code>)과는 문법이 다릅니다.</footer>
+</div>
+
+<script>
+const ICONS={
+ color:'<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#3db5df"/><circle cx="10" cy="10" r="4" fill="#fff"/><circle cx="10" cy="10" r="2" fill="#15202b"/></svg>',
+ dist:'<svg viewBox="0 0 20 20"><circle cx="6" cy="10" r="4.5" fill="#3db5df"/><circle cx="14" cy="10" r="4.5" fill="#3db5df"/><circle cx="6" cy="10" r="1.8" fill="#15202b"/><circle cx="14" cy="10" r="1.8" fill="#15202b"/></svg>',
+ force:'<svg viewBox="0 0 20 20"><rect x="3" y="8" width="14" height="9" rx="2" fill="#3db5df"/><rect x="7" y="3" width="6" height="6" rx="1.5" fill="#15202b"/></svg>',
+ hub:'<svg viewBox="0 0 20 20"><rect x="3" y="2" width="14" height="16" rx="3" fill="#3db5df"/><rect x="6" y="5" width="8" height="6" rx="1" fill="#fff"/><circle cx="10" cy="14.5" r="1.6" fill="#15202b"/></svg>',
+ motor:'<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#0090f5"/><path d="M10 4v12M4 10h12" stroke="#fff" stroke-width="2.4"/></svg>',
+ move:'<svg viewBox="0 0 20 20"><rect x="2" y="7" width="16" height="6" rx="2" fill="#ff4ccd"/><circle cx="5" cy="15" r="3" fill="#15202b"/><circle cx="15" cy="15" r="3" fill="#15202b"/></svg>',
+ light:'<svg viewBox="0 0 20 20" fill="#9a6bff"><rect x="2" y="2" width="4" height="4" rx="1"/><rect x="8" y="2" width="4" height="4" rx="1" opacity=".4"/><rect x="14" y="2" width="4" height="4" rx="1"/><rect x="2" y="8" width="4" height="4" rx="1" opacity=".4"/><rect x="8" y="8" width="4" height="4" rx="1"/><rect x="14" y="8" width="4" height="4" rx="1" opacity=".4"/><rect x="2" y="14" width="4" height="4" rx="1"/><rect x="8" y="14" width="4" height="4" rx="1" opacity=".4"/><rect x="14" y="14" width="4" height="4" rx="1"/></svg>',
+ sound:'<svg viewBox="0 0 20 20"><path d="M3 8h4l5-4v12l-5-4H3z" fill="#cf63cf"/><path d="M14.5 7a4 4 0 0 1 0 6" stroke="#cf63cf" stroke-width="2" fill="none"/></svg>'
+};
+
+/* 블록 미니 문법: {C}=포트, [10]=숫자칸, <빨간색>=드롭다운, @color=아이콘 */
+function B(shape,cat,text){
+  const parts=text.split(/(\{[^}]+\}|\[[^\]]+\]|<[^>]+>|@\w+)/).filter(Boolean).map(t=>{
+    if(t[0]==='{')return `<span class="port">${t.slice(1,-1)} ▾</span>`;
+    if(t[0]==='[')return `<span class="num">${t.slice(1,-1)}</span>`;
+    if(t[0]==='<')return `<span class="dd">${t.slice(1,-1)} ▾</span>`;
+    if(t[0]==='@')return `<span class="ico">${ICONS[t.slice(1)]}</span>`;
+    return t;
+  }).join('');
+  if(shape==='c')return `<span class="cblk ${cat}"><span class="blk stack top ${cat}">${parts}</span><span class="mouth"><span>안에 넣을 블록</span></span><span class="bot"></span></span>`;
+  if(shape==='ce'){const [a,b]=parts.split('|');return `<span class="cblk ${cat}"><span class="blk stack top ${cat}">${a}</span><span class="mouth"><span>참일 때</span></span><span class="blk mid ${cat}">${b}</span><span class="mouth"><span>거짓일 때</span></span><span class="bot"></span></span>`}
+  return `<span class="blk ${shape} ${cat}">${parts}</span>`;
+}
+
+const DATA=[
+ {id:'event',name:'이벤트',color:'--c-event',desc:'노란 모자 블록은 파이썬에서 "언제 시작할지"를 정하는 틀입니다.',rows:[
+  [B('hat','ev','프로그램이 시작되면'),'async def main():\n    # 여기에 코드를 씁니다\n\nrunloop.run(main())','모든 파이썬 프로그램의 기본 틀입니다. 블록 아래에 붙이는 내용이 main() 안으로 들어갑니다.'],
+ ]},
+ {id:'motor',name:'모터',color:'--c-motor',desc:'모터 하나를 따로 움직일 때 씁니다.',rows:[
+  [B('stack','mo','@motor{A}<시계 방향 ↻>으로 [1] <회전> 실행'),'await motor.run_for_degrees(port.A, 360, 720)','(포트, 각도, 속도). 1회전 = 360°. 반시계 방향은 각도를 -360으로 씁니다.','unit'],
+  [B('stack','mo','@motor{A}<시계 방향 ↻>으로 [1] <초> 동안 실행'),'await motor.run_for_time(port.A, 1000, 720)','(포트, 밀리초, 속도). 1초 = 1000ms.','unit'],
+  [B('stack','mo','@motor{A}<시계 방향 ↻>으로 실행 시작'),'motor.run(port.A, 720)','멈추라고 할 때까지 계속 돕니다. 속도에 - 를 붙이면 반대 방향.'],
+  [B('stack','mo','@motor{A} 정지'),'motor.stop(port.A)',''],
+  [B('stack','mo','@motor{A}<최단 경로>로 [0] 위치로 이동'),'await motor.run_to_absolute_position(port.A, 0, 720)','모터 표시 눈금(0~359) 기준 위치로 돌아갑니다.'],
+  [B('stack','mo','@motor{A} 속도를 [75] %로 설정'),'SPEED = 750   # 이후 명령마다 속도로 넣기\nmotor.run(port.A, SPEED)','파이썬에는 "속도 설정"이 따로 없어서 명령마다 속도를 적습니다.','unit'],
+  [B('stack','mo','@motor{A} 상대 위치를 [0]으로 설정'),'motor.reset_relative_position(port.A, 0)',''],
+  [B('rep','mo','@motor{A} 상대 위치'),'motor.relative_position(port.A)','지금까지 돈 누적 각도(도).'],
+  [B('rep','mo','@motor{A} 속도'),'motor.velocity(port.A)','블록은 %, 파이썬은 °/s 로 알려줍니다.','unit'],
+ ]},
+ {id:'move',name:'이동',color:'--c-move',desc:'바퀴 모터 두 개를 한 쌍으로 묶어 로봇을 움직입니다.',rows:[
+  [B('stack','mv','@move 이동 모터를 <A+B>로 설정'),'motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)','다른 이동 명령보다 먼저 한 번 써야 합니다.'],
+  [B('stack','mv','@move <↑>[10]<cm> 이동'),'await motor_pair.move_for_degrees(motor_pair.PAIR_1, 205, 0)','파이썬은 cm 대신 바퀴 각도로 지정합니다. 작은 바퀴(지름 5.6cm)는 한 바퀴에 약 17.6cm → 10cm ≈ 205°.','unit'],
+  [B('stack','mv','@move <↑>[1]<초> 이동'),'await motor_pair.move_for_time(motor_pair.PAIR_1, 1000, 0)','(쌍, 밀리초, 조향). 마지막 0은 "똑바로".','unit'],
+  [B('stack','mv','@move <↑> 이동 시작'),'motor_pair.move(motor_pair.PAIR_1, 0)','두 번째 숫자는 조향(-100 왼쪽 ~ 100 오른쪽).'],
+  [B('stack','mv','@move [30] 방향으로 이동 시작'),'motor_pair.move(motor_pair.PAIR_1, 30)',''],
+  [B('stack','mv','@move 왼쪽 [50]% 오른쪽 [50]%로 이동 시작'),'motor_pair.move_tank(motor_pair.PAIR_1, 500, 500)','바퀴 두 개의 속도를 따로 정합니다(°/s).','unit'],
+  [B('stack','mv','@move 이동 정지'),'motor_pair.stop(motor_pair.PAIR_1)',''],
+ ]},
+ {id:'light',name:'빛',color:'--c-light',desc:'허브 앞면 5×5 빛 매트릭스와 버튼 불빛.',rows:[
+  [B('stack','li','@light[Hello] 쓰기'),'light_matrix.write("Hello")','글자는 따옴표 안에 씁니다.'],
+  [B('stack','li','@light<웃는 얼굴> 켜기'),'light_matrix.show_image(light_matrix.IMAGE_HAPPY)','IMAGE_HEART, IMAGE_SAD 같은 이름으로 바꿀 수 있어요.'],
+  [B('stack','li','@light 픽셀 끄기'),'light_matrix.clear()',''],
+  [B('stack','li','@light[1],[1] 픽셀을 [100]% 밝기로 켜기'),'light_matrix.set_pixel(0, 0, 100)','블록은 1부터, 파이썬은 0부터 셉니다!','unit'],
+  [B('stack','li','@light 버튼 불빛을 <빨간색>으로 설정'),'light.color(light.POWER, color.RED)',''],
+ ]},
+ {id:'sound',name:'소리',color:'--c-sound',desc:'허브 스피커로 비프음을 냅니다.',rows:[
+  [B('stack','so','@sound[60] 음을 [0.2]초 동안 비프음 재생'),'await sound.beep(262, 200, 100)','(주파수 Hz, 밀리초, 음량). 블록의 60번 음(가운데 도) ≈ 262Hz.','unit'],
+  [B('stack','so','@sound 모든 소리 정지'),'sound.stop()',''],
+  [B('stack','so','@sound 음량을 [50]%로 설정'),'sound.volume(50)',''],
+ ]},
+ {id:'control',name:'제어',color:'--c-control',desc:'C자 블록 안에 들어간 블록 = 파이썬에서 4칸 들여쓴 줄.',rows:[
+  [B('stack','co','[1] 초 기다리기'),'await runloop.sleep_ms(1000)','await 는 "끝날 때까지 기다려"라는 뜻입니다.','unit'],
+  [B('c','co','[10] 번 반복하기'),'for i in range(10):\n    # 반복할 코드',''],
+  [B('c','co','무한 반복하기'),'while True:\n    # 반복할 코드',''],
+  [B('c','co','만약 ⬡ 라면'),'if 조건:\n    # 참일 때 코드',''],
+  [B('ce','co','만약 ⬡ 라면|아니면'),'if 조건:\n    # 참일 때\nelse:\n    # 거짓일 때',''],
+  [B('stack','co','⬡ 까지 기다리기'),'await runloop.until(lambda: 조건)','lambda: 뒤에 조건을 씁니다.'],
+  [B('c','co','⬡ 까지 반복하기'),'while not 조건:\n    # 반복할 코드','"~할 때까지" = "~가 아닌 동안" 이라서 not 을 붙입니다.'],
+ ]},
+ {id:'sensor',name:'센서',color:'--c-sensor',desc:'둥근 블록은 값을, 육각형 블록은 참/거짓을 돌려줍니다.',rows:[
+  [B('rep','se','@color{C} 반사광'),'color_sensor.reflection(port.C)','0(어두움) ~ 100(밝음). 수업 첫 예시 블록입니다.','star'],
+  [B('bool','se','@color{C} 반사광 <&lt;>[50]% ?'),'color_sensor.reflection(port.C) < 50','육각형 블록 = 비교식. if 나 until 안에 넣어 씁니다.'],
+  [B('rep','se','@color{C} 색상'),'color_sensor.color(port.C)','색 번호가 나옵니다. color.RED 같은 이름과 비교해요.'],
+  [B('bool','se','@color{C} 색상이 <빨간색> ?'),'color_sensor.color(port.C) == color.RED','같다는 비교는 = 가 아니라 == 두 개!'],
+  [B('rep','se','@dist{D} 거리 <cm>'),'distance_sensor.distance(port.D)','mm 단위입니다. cm로 쓰려면 // 10. 감지 못 하면 -1.','unit'],
+  [B('bool','se','@dist{D} 가 <&lt;>[10]<cm> 보다 가까운가?'),'0 < distance_sensor.distance(port.D) < 100','-1(감지 안 됨)을 빼려고 0보다 큰지도 함께 봅니다.','unit'],
+  [B('bool','se','@force{E} 가 <눌렸나> ?'),'force_sensor.pressed(port.E)',''],
+  [B('rep','se','@force{E} 압력 <%>'),'force_sensor.force(port.E)','0~100 (0.1뉴턴 단위, 100 = 10N).'],
+  [B('rep','se','@hub<요> 각도'),'motion_sensor.tilt_angles()[0]','요·피치·롤 순서로 나오고 0.1도 단위입니다. 블록 값처럼 쓰려면 ÷10.','unit'],
+  [B('stack','se','@hub 요 각도를 [0]으로 설정'),'motion_sensor.reset_yaw(0)',''],
+  [B('bool','se','@hub<왼쪽> 버튼이 <눌렸나> ?'),'button.pressed(button.LEFT) > 0','눌린 시간(ms)이 나오므로 0보다 크면 눌린 것입니다.'],
+ ]},
+ {id:'op',name:'연산',color:'--c-op',desc:'계산과 비교 블록.',rows:[
+  [B('rep','op','[1] 에서 [10] 사이의 난수'),'random.randint(1, 10)','맨 위에 import random 이 필요합니다.'],
+  [B('bool','op','[ ] &gt; [50]'),'값 > 50',''],
+  [B('bool','op','⬡ 그리고 ⬡'),'조건1 and 조건2',''],
+  [B('bool','op','⬡ 이(가) 아니다'),'not 조건',''],
+ ]},
+];
+
+const KW=/\b(async|def|await|while|True|False|if|else|elif|for|in|range|import|from|not|and|or|lambda|return)\b/;
+function hl(src){
+  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return src.split('\n').map(line=>{
+    const tok=/(#.*$)|("[^"]*")|(\b\d+\b)|(\b[A-Za-z_]\w*\b)|([^#"\w]+|\w+)/g; let out='',m;
+    while((m=tok.exec(line))){
+      if(m[1])out+=`<span class="c">${esc(m[1])}</span>`;
+      else if(m[2])out+=`<span class="s">${esc(m[2])}</span>`;
+      else if(m[3])out+=`<span class="n">${m[3]}</span>`;
+      else if(m[4]){const w=m[4];const next=line[tok.lastIndex];
+        if(KW.test(w)&&w.match(KW)[0]===w)out+=`<span class="k">${w}</span>`;
+        else if(next==='(')out+=`<span class="f">${w}</span>`;
+        else out+=w;}
+      else out+=esc(m[5]);
+    }
+    return out;
+  }).join('\n');
+}
+function codeBox(src){return `<div class="code"><pre>${hl(src)}</pre><button class="copy" type="button">복사</button></div>`}
+
+const cats=document.getElementById('cats');
+cats.innerHTML=DATA.map(c=>`
+<section class="cat" data-cat="${c.id}">
+  <div class="cat-head"><span class="sw" style="background:var(${c.color})"></span><div><h2>${c.name}</h2><p class="muted">${c.desc}</p></div></div>
+  <div class="rows">${c.rows.map(([blk,py,note,flag])=>`
+    <div class="row${flag==='star'?' star':''}">
+      <div class="blk-cell">${blk}</div>
+      ${codeBox(py)}
+      ${note?`<p class="note">${flag==='unit'?'<span class="tag">단위 주의</span>':flag==='star'?'<span class="tag ok">예시</span>':''}<span>${note}</span></p>`:''}
+    </div>`).join('')}</div>
+</section>`).join('');
+
+// 정적 코드 블록 하이라이트
+document.querySelectorAll('[data-hl]').forEach(el=>{
+  const raw=el.textContent; el.innerHTML=hl(raw);
+  if(el.tagName==='PRE'){const b=document.createElement('button');b.className='copy';b.type='button';b.textContent='복사';el.parentNode.appendChild(b);}
+});
+document.querySelectorAll('[data-i]').forEach(el=>el.innerHTML=ICONS[el.dataset.i]);
+
+// 복사
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('.copy'); if(!b)return;
+  const text=b.parentNode.querySelector('pre').textContent;
+  try{await navigator.clipboard.writeText(text);b.textContent='복사됨';}
+  catch{const r=document.createRange();r.selectNodeContents(b.parentNode.querySelector('pre'));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='선택됨';}
+  setTimeout(()=>b.textContent='복사',1400);
+});
+
+// 필터
+const fl=document.getElementById('filters');
+const all=[{id:'all',name:'전체'}].concat(DATA);
+let saved='all'; try{saved=localStorage.getItem('spike-cat')||'all'}catch{}
+fl.innerHTML=all.map(c=>`<button class="chip" type="button" id="chip-${c.id}" data-id="${c.id}" aria-pressed="false">${c.color?`<i style="background:var(${c.color})"></i>`:''}${c.name}</button>`).join('');
+function apply(id){
+  fl.querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.id===id));
+  cats.querySelectorAll('.cat').forEach(s=>s.hidden=!(id==='all'||s.dataset.cat===id));
+  try{localStorage.setItem('spike-cat',id)}catch{}
+}
+fl.addEventListener('click',e=>{const b=e.target.closest('.chip');if(b)apply(b.dataset.id)});
+apply(DATA.some(d=>d.id===saved)?saved:'all');
+
+// 연습 문제
+const Q=[
+ [B('stack','mo','@motor{A}<시계 방향 ↻>으로 [2] <회전> 실행'),'await motor.run_for_degrees(port.A, 720, 720)','2회전 = 360 × 2 = 720°'],
+ [B('stack','co','[0.5] 초 기다리기'),'await runloop.sleep_ms(500)','0.5초 = 500ms'],
+ [B('bool','se','@color{B} 반사광 <&gt;>[70]% ?'),'color_sensor.reflection(port.B) > 70','포트가 B로 바뀐 것에 주의'],
+ [B('stack','li','@light[3],[3] 픽셀을 [100]% 밝기로 켜기'),'light_matrix.set_pixel(2, 2, 100)','가운데 픽셀. 1씩 빼서 0부터 세기'],
+];
+document.getElementById('quiz').innerHTML=Q.map(([b,py,why],i)=>`
+<div class="qcard"><div class="q"><b>문제 ${i+1}.</b> 이 블록을 파이썬 한 줄로 써 보세요.<div>${b}</div></div>
+<details><summary>정답 보기</summary>${codeBox(py)}<p class="muted" style="margin-top:8px;font-size:14px">${why}</p></details></div>`).join('');
+</script>
+
+</body></html>
