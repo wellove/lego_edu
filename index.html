@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
-/* Layout: 실습지 느낌의 한 칸 문서. 카테고리마다 [블록 | 파이썬] 두 칸 대응 행, 폰에서는 위아래로 쌓임 */
+/* Layout: 실습지 느낌의 한 칸 문서. 대응표 → 예제 모음(목록+보기) → 조합 만들기 → 연습 문제 */
 :root{
   --bg:#eef3f7; --surface:#ffffff; --ink:#15202b; --muted:#566676; --line:#d6e0e8;
   --accent:#0a74c9; --warn:#b4530a; --warn-bg:#fff4e6;
@@ -12,7 +12,6 @@
   --f-display:"Do Hyeon","Noto Sans KR",system-ui,sans-serif;
   --f-body:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;
   --f-code:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
-  /* SPIKE 블록 카테고리 색 (테마와 무관하게 동일) */
   --c-event:#e6a800; --c-motor:#0090f5; --c-move:#ff4ccd; --c-light:#9a6bff; --c-sound:#cf63cf;
   --c-control:#f5a015; --c-sensor:#3db5df; --c-op:#4cb04c;
 }
@@ -26,24 +25,26 @@
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
-.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:36px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
 h1,h2,h3{font-family:var(--f-display);font-weight:400;text-wrap:balance;margin:0;line-height:1.2}
 h1{font-size:clamp(30px,6vw,46px)}
 h2{font-size:28px}
-h3{font-size:20px}
+h3{font-size:22px}
 p{margin:0}
+code{font-family:var(--f-code);font-size:.92em}
 .eyebrow{font-size:12px;letter-spacing:.12em;font-weight:700;color:var(--accent)}
 .muted{color:var(--muted)}
 
-/* hero */
 header{display:flex;flex-direction:column;gap:14px}
 .lede{max-width:62ch;color:var(--muted)}
+.toc{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:14px}
+.toc a{color:var(--accent);font-weight:700;text-decoration:none}
+.toc a:hover{text-decoration:underline}
 .equation{display:flex;flex-wrap:wrap;align-items:center;gap:14px 18px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
 .equation .eq{font-family:var(--f-display);font-size:34px;color:var(--muted)}
-.equation code.big{font-family:var(--f-code);font-size:clamp(14px,2.6vw,19px);background:var(--code-bg);color:var(--code-ink);padding:10px 14px;border-radius:8px;overflow-x:auto;max-width:100%}
+.equation code.big{font-size:clamp(14px,2.6vw,19px);background:var(--code-bg);color:var(--code-ink);padding:10px 14px;border-radius:8px;overflow-x:auto;max-width:100%}
 .equation .cap{flex-basis:100%;font-size:14px;color:var(--muted)}
 
-/* 단위 차이 */
 .units{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .unit{background:var(--warn-bg);border:1px solid color-mix(in srgb,var(--warn) 30%,transparent);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
 .unit b{font-size:13px;color:var(--warn);letter-spacing:.04em}
@@ -51,35 +52,30 @@ header{display:flex;flex-direction:column;gap:14px}
 .unit .conv span{color:var(--muted)}
 .unit small{color:var(--muted);font-size:13px;line-height:1.5}
 
-/* import */
-.imports{display:flex;flex-direction:column;gap:10px}
-
-/* 필터 */
 .filters{display:flex;flex-wrap:wrap;gap:8px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 .chip{font:600 14px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
 .chip i{width:10px;height:10px;border-radius:3px;display:inline-block}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.chip:focus-visible,.copy:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button:focus-visible,summary:focus-visible,input:focus-visible+span{outline:3px solid var(--accent);outline-offset:2px}
 
-/* 카테고리 */
 .cat{display:flex;flex-direction:column;gap:12px}
 .cat-head{display:flex;align-items:center;gap:12px}
 .cat-head .sw{width:28px;height:28px;border-radius:7px;flex:none}
 .cat-head p{font-size:14px}
+.ext{font:700 11px var(--f-body);letter-spacing:.06em;border:1.5px solid currentColor;border-radius:5px;padding:1px 6px;vertical-align:middle;margin-left:6px;color:var(--accent)}
 .rows{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:10px 22px;padding:16px 18px;border-top:1px solid var(--line);align-items:center}
 .row:first-child{border-top:0}
 .row.star{background:color-mix(in srgb,var(--c-sensor) 9%,var(--surface))}
 .row .blk-cell{min-width:0}
 .row .note{grid-column:1/-1;font-size:13.5px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
-.tag{font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:5px;background:var(--warn-bg);color:var(--warn);white-space:nowrap}
+.tag{font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:5px;background:var(--warn-bg);color:var(--warn);white-space:nowrap;height:fit-content}
 .tag.ok{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent)}
 @media (max-width:720px){.row{grid-template-columns:minmax(0,1fr)}}
 
-/* 코드 */
 .code{position:relative;min-width:0}
-.code pre{margin:0;background:var(--code-bg);color:var(--code-ink);font:13.5px/1.55 var(--f-code);padding:11px 44px 11px 14px;border-radius:8px;overflow-x:auto;tab-size:4}
+.code pre{margin:0;background:var(--code-bg);color:var(--code-ink);font:13.5px/1.55 var(--f-code);padding:11px 48px 11px 14px;border-radius:8px;overflow-x:auto;tab-size:4}
 .copy{position:absolute;top:6px;right:6px;font:600 11px var(--f-body);background:rgba(255,255,255,.1);color:var(--code-ink);border:1px solid rgba(255,255,255,.18);border-radius:5px;padding:3px 7px;cursor:pointer}
 .copy:hover{background:rgba(255,255,255,.2)}
 .k{color:var(--code-kw)} .f{color:var(--code-fn)} .n{color:var(--code-num)} .s{color:var(--code-str)} .c{color:var(--code-com);font-style:italic}
@@ -90,16 +86,15 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .blk.stack{margin-top:5px}
 .blk.stack::before{content:"";position:absolute;top:-5px;left:14px;width:22px;height:6px;background:var(--b);border-radius:3px 3px 0 0}
 .blk.hat{border-radius:22px 22px 5px 5px;padding-top:14px;min-height:50px}
-.blk.rep{border-radius:999px;padding:6px 14px 6px 6px}
-.blk.bool{clip-path:polygon(16px 0,calc(100% - 16px) 0,100% 50%,calc(100% - 16px) 100%,16px 100%,0 50%);padding:6px 22px;box-shadow:none}
-.blk .ico{width:28px;height:28px;border-radius:6px;background:rgba(255,255,255,.95);display:grid;place-items:center;flex:none}
-.blk .ico svg{width:20px;height:20px}
+.blk.rep{border-radius:999px;padding:5px 13px 5px 5px;min-height:36px;box-shadow:inset 0 -2px 0 rgba(0,0,0,.18),0 0 0 1px rgba(0,0,0,.08)}
+.blk.bool{clip-path:polygon(16px 0,calc(100% - 16px) 0,100% 50%,calc(100% - 16px) 100%,16px 100%,0 50%);padding:6px 22px;min-height:36px;box-shadow:none}
+.blk .ico{width:26px;height:26px;border-radius:6px;background:rgba(255,255,255,.95);display:grid;place-items:center;flex:none}
+.blk .ico svg{width:19px;height:19px}
 .blk .port{background:#fff;color:#2a3540;border-radius:999px;padding:4px 9px;font-size:13px;text-shadow:none}
 .blk .num{background:#fff;color:#2a3540;border-radius:999px;padding:4px 10px;font-size:13px;min-width:30px;text-align:center;text-shadow:none}
 .blk .dd{background:rgba(0,0,0,.16);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:3px 10px;font-size:13px}
 .ev{--b:var(--c-event)} .mo{--b:var(--c-motor)} .mv{--b:var(--c-move)} .li{--b:var(--c-light)} .so{--b:var(--c-sound)}
 .co{--b:var(--c-control)} .se{--b:var(--c-sensor)} .op{--b:var(--c-op)}
-/* C자 블록 */
 .cblk{display:inline-flex;flex-direction:column;--b:var(--c-control);max-width:100%}
 .cblk .top{border-radius:5px 5px 0 5px}
 .cblk .mouth{display:flex;min-height:30px}
@@ -109,25 +104,56 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .cblk .mid{border-radius:0 5px 5px 0;margin-top:0;width:fit-content}
 .cblk .top::before{display:none}
 
-/* 예제 프로그램 */
-.example{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:18px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
-@media (max-width:760px){.example{grid-template-columns:minmax(0,1fr)}}
-.script{display:flex;flex-direction:column;align-items:flex-start;overflow-x:auto;padding-bottom:4px}
-.script .blk{margin-top:0;border-radius:0 5px 5px 5px}
-.script .blk.stack::before{top:-1px;opacity:0}
-.script .ind{padding-left:18px;border-left:18px solid var(--c-control);display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding-block:3px}
-.script .ind .ind{border-left-color:var(--c-control)}
-.script .cap{background:var(--c-control);height:14px;width:110px;border-radius:0 0 5px 5px}
-.script .gap{height:2px}
-.lines{font-size:13.5px;color:var(--muted);grid-column:1/-1;display:flex;flex-direction:column;gap:4px}
+/* 블록 스크립트(조립된 프로그램) */
+.script{display:flex;flex-direction:column;align-items:flex-start;gap:2px;overflow-x:auto;padding:6px 2px;min-width:0}
+.script > .blk,.script .ind > .blk{border-radius:0 5px 5px 5px;margin-top:0}
+.script > .blk.hat{border-radius:22px 22px 5px 5px}
+.script .blk.stack::before{display:none}
+.script .ind{display:flex;flex-direction:column;align-items:flex-start;gap:2px;border-left:18px solid var(--c-control);padding-block:3px;min-height:28px}
+.script .ctop{border-radius:5px 5px 5px 0!important}
+.script .cap{background:var(--c-control);height:14px;width:110px;border-radius:0 0 5px 5px;box-shadow:inset 0 -2px 0 rgba(0,0,0,.18)}
 
-/* 연습 */
+/* 두 칸 보기 */
+.duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:18px;align-items:start}
+@media (max-width:820px){.duo{grid-template-columns:minmax(0,1fr)}}
+.panel-label{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+
+/* 예제 모음 */
+.ex-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:820px){.ex-layout{grid-template-columns:minmax(0,1fr)}}
+.ex-list{display:flex;flex-direction:column;gap:4px}
+@media (max-width:820px){.ex-list{flex-direction:row;flex-wrap:wrap}}
+.ex-item{font:500 14px/1.35 var(--f-body);text-align:left;background:transparent;color:var(--ink);border:1px solid transparent;border-radius:9px;padding:9px 12px;cursor:pointer;display:flex;flex-direction:column;gap:5px}
+.ex-item:hover{background:var(--surface);border-color:var(--line)}
+.ex-item[aria-current="true"]{background:var(--surface);border-color:var(--ink);font-weight:700}
+@media (max-width:820px){.ex-item{border-color:var(--line);background:var(--surface)}}
+.dots{display:flex;gap:4px}
+.dots i{width:9px;height:9px;border-radius:50%}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.card-head{display:flex;flex-direction:column;gap:8px}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{font-size:12px;font-weight:700;color:#fff;border-radius:999px;padding:2px 10px;background:var(--p)}
+.challenge{border-top:1px dashed var(--line);padding-top:12px;font-size:14px;display:flex;gap:10px;align-items:baseline}
+.challenge b{color:var(--accent);white-space:nowrap}
+
+/* 조합 만들기 */
+.builder{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.builder{grid-template-columns:minmax(0,1fr)}}
+fieldset{border:1px solid var(--line);border-radius:12px;background:var(--surface);margin:0;padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px}
+.picks{display:flex;flex-direction:column;gap:12px}
+legend{font-family:var(--f-display);font-size:18px;padding:0 6px}
+.opt{display:flex;align-items:center;gap:9px;font-size:14px;cursor:pointer;padding:5px 6px;border-radius:7px}
+.opt:hover{background:var(--bg)}
+.opt input{accent-color:var(--accent);width:17px;height:17px;margin:0;flex:none}
+.opt i{width:10px;height:10px;border-radius:3px;flex:none}
+.build-title{font-family:var(--f-display);font-size:20px}
+
 .quiz{display:flex;flex-direction:column;gap:12px}
 .qcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
 .qcard .q{display:flex;flex-direction:column;gap:10px}
 summary{cursor:pointer;font-weight:700;color:var(--accent);width:fit-content}
 details[open] summary{margin-bottom:10px}
-footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;max-width:70ch}
+footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;max-width:75ch}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -136,6 +162,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
   <span class="eyebrow">LEGO SPIKE PRIME · 블록 코딩에서 파이썬으로</span>
   <h1>스파이크 블록 ↔ 파이썬 대응표</h1>
   <p class="lede">블록 하나는 파이썬 한 줄과 같은 일을 합니다. 왼쪽 블록을 보고 오른쪽 코드를 읽어 보세요. 기준은 SPIKE 앱 3 버전의 파이썬입니다.</p>
+  <nav class="toc" aria-label="바로가기"><a href="#units">단위 차이</a><a href="#table">대응표</a><a href="#ex">예제 모음</a><a href="#build">조합 만들기</a><a href="#quiz-sec">연습 문제</a></nav>
   <div class="equation">
     <span class="blk rep se"><span class="ico" data-i="color"></span><span class="port">C ▾</span>반사광</span>
     <span class="eq">=</span>
@@ -144,20 +171,21 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
   </div>
 </header>
 
-<section class="cat">
-  <div><span class="eyebrow">먼저 읽기</span><h2>단위가 다른 곳 6가지</h2></div>
+<section class="cat" id="units">
+  <div><span class="eyebrow">먼저 읽기</span><h2>단위가 다른 곳 7가지</h2></div>
   <p class="muted">블록과 파이썬은 같은 일을 하지만 숫자의 단위가 다른 곳이 있어요. 블록 숫자를 그대로 옮기면 로봇이 다르게 움직입니다.</p>
   <div class="units">
     <div class="unit"><b>시간</b><div class="conv">1 초 <span>→</span> 1000 ms</div><small>파이썬은 밀리초(1/1000초)를 씁니다.</small></div>
     <div class="unit"><b>모터 속도</b><div class="conv">50 % <span>→</span> 약 500 °/s</div><small>파이썬은 초당 회전 각도(도/초). 대략 1%≈10°/s로 생각하세요.</small></div>
+    <div class="unit"><b>모터 출력(확장)</b><div class="conv">100 % <span>→</span> 10000</div><small>출력(듀티 사이클)은 -10000~10000. %에 100을 곱합니다.</small></div>
     <div class="unit"><b>회전 수</b><div class="conv">1 회전 <span>→</span> 360 °</div><small>파이썬은 회전 수 대신 각도로 지정합니다.</small></div>
     <div class="unit"><b>거리 센서</b><div class="conv">10 cm <span>→</span> 100 mm</div><small>파이썬은 mm로 알려주고, 아무것도 없으면 -1이 나옵니다.</small></div>
-    <div class="unit"><b>빛 매트릭스 좌표</b><div class="conv">1~5 <span>→</span> 0~4</div><small>파이썬은 0부터 셉니다. 블록 (1,1)은 파이썬 (0,0)입니다.</small></div>
+    <div class="unit"><b>라이트 매트릭스 좌표</b><div class="conv">1~5 <span>→</span> 0~4</div><small>파이썬은 0부터 셉니다. 블록 (1,1)은 파이썬 (0,0)입니다.</small></div>
     <div class="unit"><b>기울기 각도</b><div class="conv">90 ° <span>→</span> 900</div><small>파이썬은 0.1도 단위라서 10으로 나눠야 블록 값과 같아집니다.</small></div>
   </div>
 </section>
 
-<section class="cat imports">
+<section class="cat">
   <div><span class="eyebrow">모든 프로그램의 첫 줄</span><h2>불러오기(import)</h2></div>
   <p class="muted">블록은 팔레트에 이미 다 있지만, 파이썬은 쓸 도구를 맨 위에서 불러와야 합니다. 아래 줄을 복사해서 시작하면 이 표의 모든 코드를 쓸 수 있어요.</p>
   <div class="code"><pre data-hl>from hub import port, light_matrix, light, sound, button, motion_sensor
@@ -165,57 +193,41 @@ import motor, motor_pair, color_sensor, distance_sensor, force_sensor
 import color, runloop, random</pre></div>
 </section>
 
+<section class="cat" id="table">
+  <div><span class="eyebrow">블록 하나 = 파이썬 한 줄</span><h2>대응표</h2></div>
+</section>
 <nav class="filters" id="filters" aria-label="카테고리 고르기"></nav>
-
 <div id="cats" class="wrap" style="gap:36px"></div>
 
 <section class="cat" id="ex">
-  <div><span class="eyebrow">합쳐 보기</span><h2>예제: 검은 선 따라가기</h2></div>
-  <p class="muted">위의 블록들을 모으면 프로그램이 됩니다. 블록의 들여쓰기(C자 안에 들어간 블록)는 파이썬의 <b>들여쓰기 4칸</b>과 똑같은 뜻이에요.</p>
-  <div class="example">
-    <div class="script" aria-label="블록 프로그램">
-      <span class="blk hat ev">프로그램이 시작되면</span>
-      <span class="blk stack mv"><span class="ico" data-i="move"></span>이동 모터를 <span class="dd">A+B ▾</span>로 설정</span>
-      <span class="blk stack co" style="border-radius:0 5px 0 0">무한 반복하기</span>
-      <div class="ind">
-        <span class="blk stack co" style="border-radius:0 5px 0 0">만약 <span class="blk bool se" style="min-height:32px"><span class="port">C ▾</span>반사광 <span class="dd">&lt; ▾</span><span class="num">50</span>%?</span> 라면</span>
-        <div class="ind">
-          <span class="blk stack mv"><span class="ico" data-i="move"></span>왼쪽 <span class="num">20</span>% 오른쪽 <span class="num">50</span>%로 이동 시작</span>
-        </div>
-        <span class="blk stack co" style="border-radius:0 5px 0 0">아니면</span>
-        <div class="ind">
-          <span class="blk stack mv"><span class="ico" data-i="move"></span>왼쪽 <span class="num">50</span>% 오른쪽 <span class="num">20</span>%로 이동 시작</span>
-        </div>
-        <div class="cap" style="margin-left:-18px"></div>
-      </div>
-      <div class="cap"></div>
-    </div>
-    <div class="code"><pre data-hl>from hub import port
-import motor_pair, color_sensor, runloop
-
-async def main():                                  # 프로그램이 시작되면
-    motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
-    while True:                                    # 무한 반복하기
-        if color_sensor.reflection(port.C) &lt; 50:   # 만약 반사광 &lt; 50% 라면
-            motor_pair.move_tank(motor_pair.PAIR_1, 200, 500)
-        else:                                      # 아니면
-            motor_pair.move_tank(motor_pair.PAIR_1, 500, 200)
-        await runloop.sleep_ms(10)
-
-runloop.run(main())</pre></div>
-    <div class="lines">
-      <p>· 반사광이 50보다 작으면(검은 선 위) 왼쪽으로, 크면(흰 바탕) 오른쪽으로 꺾으며 선 가장자리를 따라갑니다.</p>
-      <p>· 마지막 <code>await runloop.sleep_ms(10)</code>은 블록에는 없지만 반복이 너무 빨리 돌지 않게 잠깐 쉬는 줄입니다.</p>
-    </div>
+  <div><span class="eyebrow">합쳐 보기</span><h2>예제 모음</h2></div>
+  <p class="muted">센서·라이트·소리를 하나씩 써 보는 <b>기본 예제</b>와, 여러 개를 합친 <b>응용 예제</b>가 있어요. C자 블록 안에 들어간 블록은 파이썬의 <b>들여쓰기 4칸</b>과 같은 뜻입니다.</p>
+  <div class="filters" id="exGroups" style="position:static" role="group" aria-label="예제 종류"></div>
+  <div class="ex-layout">
+    <nav class="ex-list" id="exList" aria-label="예제 목록"></nav>
+    <article class="card" id="exView" aria-live="polite"></article>
   </div>
 </section>
 
-<section class="cat">
+<section class="cat" id="build">
+  <div><span class="eyebrow">직접 만들기</span><h2>센서 + 출력 조합 만들기</h2></div>
+  <p class="muted">센서 조건 하나와 출력을 고르면 블록 프로그램과 파이썬 코드가 함께 만들어집니다. 라이트와 소리를 같이 고르면 둘이 함께 작동해요.</p>
+  <div class="builder">
+    <div class="picks">
+      <fieldset id="fTrig"><legend>1. 언제?</legend></fieldset>
+      <fieldset id="fAct"><legend>2. 그러면? (여러 개 고르기)</legend></fieldset>
+      <fieldset id="fElse"><legend>3. 아닐 때는?</legend></fieldset>
+    </div>
+    <article class="card" id="buildOut" aria-live="polite"></article>
+  </div>
+</section>
+
+<section class="cat" id="quiz-sec">
   <div><span class="eyebrow">직접 해보기</span><h2>블록을 파이썬으로 바꿔 보세요</h2></div>
   <div class="quiz" id="quiz"></div>
 </section>
 
-<footer>SPIKE 앱 버전에 따라 블록에 적힌 한글 표현이 조금 다를 수 있습니다. 파이썬 코드는 SPIKE 앱 3의 파이썬(모듈 <code>motor</code>, <code>motor_pair</code>, <code>runloop</code> 등) 기준입니다. 예전 SPIKE 2 파이썬(<code>from spike import ...</code>)과는 문법이 다릅니다.</footer>
+<footer>SPIKE 앱 버전에 따라 블록에 적힌 한글 표현이 조금 다를 수 있습니다. 파이썬 코드는 SPIKE 앱 3의 파이썬(모듈 <code>motor</code>, <code>motor_pair</code>, <code>runloop</code> 등) 기준이며, 예전 SPIKE 2 파이썬(<code>from spike import ...</code>)과는 문법이 다릅니다. 가속률처럼 블록의 단계(느림·중간·빠름)를 숫자로 옮긴 값은 수업용 예시값이니 로봇에 맞게 조정하세요.</footer>
 </div>
 
 <script>
@@ -225,28 +237,61 @@ const ICONS={
  force:'<svg viewBox="0 0 20 20"><rect x="3" y="8" width="14" height="9" rx="2" fill="#3db5df"/><rect x="7" y="3" width="6" height="6" rx="1.5" fill="#15202b"/></svg>',
  hub:'<svg viewBox="0 0 20 20"><rect x="3" y="2" width="14" height="16" rx="3" fill="#3db5df"/><rect x="6" y="5" width="8" height="6" rx="1" fill="#fff"/><circle cx="10" cy="14.5" r="1.6" fill="#15202b"/></svg>',
  motor:'<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#0090f5"/><path d="M10 4v12M4 10h12" stroke="#fff" stroke-width="2.4"/></svg>',
+ motorx:'<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#0090f5"/><circle cx="10" cy="5.5" r="1.7" fill="#fff"/><circle cx="10" cy="14.5" r="1.7" fill="#fff"/><circle cx="5.5" cy="10" r="1.7" fill="#fff"/><circle cx="14.5" cy="10" r="1.7" fill="#fff"/><circle cx="10" cy="10" r="1.7" fill="#fff"/></svg>',
  move:'<svg viewBox="0 0 20 20"><rect x="2" y="7" width="16" height="6" rx="2" fill="#ff4ccd"/><circle cx="5" cy="15" r="3" fill="#15202b"/><circle cx="15" cy="15" r="3" fill="#15202b"/></svg>',
  light:'<svg viewBox="0 0 20 20" fill="#9a6bff"><rect x="2" y="2" width="4" height="4" rx="1"/><rect x="8" y="2" width="4" height="4" rx="1" opacity=".4"/><rect x="14" y="2" width="4" height="4" rx="1"/><rect x="2" y="8" width="4" height="4" rx="1" opacity=".4"/><rect x="8" y="8" width="4" height="4" rx="1"/><rect x="14" y="8" width="4" height="4" rx="1" opacity=".4"/><rect x="2" y="14" width="4" height="4" rx="1"/><rect x="8" y="14" width="4" height="4" rx="1" opacity=".4"/><rect x="14" y="14" width="4" height="4" rx="1"/></svg>',
  sound:'<svg viewBox="0 0 20 20"><path d="M3 8h4l5-4v12l-5-4H3z" fill="#cf63cf"/><path d="M14.5 7a4 4 0 0 1 0 6" stroke="#cf63cf" stroke-width="2" fill="none"/></svg>'
 };
 
-/* 블록 미니 문법: {C}=포트, [10]=숫자칸, <빨간색>=드롭다운, @color=아이콘 */
-function B(shape,cat,text){
-  const parts=text.split(/(\{[^}]+\}|\[[^\]]+\]|<[^>]+>|@\w+)/).filter(Boolean).map(t=>{
+/* 블록 미니 문법: {C}=포트, [10]=숫자칸, <빨간색>=드롭다운, @color=아이콘, $1 $2=안에 끼운 블록 */
+function P(text,nest=[]){
+  let h=text.split(/(\{[^}]+\}|\[[^\]]*\]|<[^>]+>|@\w+)/).filter(Boolean).map(t=>{
     if(t[0]==='{')return `<span class="port">${t.slice(1,-1)} ▾</span>`;
-    if(t[0]==='[')return `<span class="num">${t.slice(1,-1)}</span>`;
+    if(t[0]==='[')return `<span class="num">${t.slice(1,-1)||'&nbsp;'}</span>`;
     if(t[0]==='<')return `<span class="dd">${t.slice(1,-1)} ▾</span>`;
     if(t[0]==='@')return `<span class="ico">${ICONS[t.slice(1)]}</span>`;
     return t;
   }).join('');
+  nest.forEach((n,i)=>{h=h.replace('$'+(i+1),n)});
+  return h;
+}
+function B(shape,cat,text,...nest){
+  const parts=P(text,nest);
   if(shape==='c')return `<span class="cblk ${cat}"><span class="blk stack top ${cat}">${parts}</span><span class="mouth"><span>안에 넣을 블록</span></span><span class="bot"></span></span>`;
   if(shape==='ce'){const [a,b]=parts.split('|');return `<span class="cblk ${cat}"><span class="blk stack top ${cat}">${a}</span><span class="mouth"><span>참일 때</span></span><span class="blk mid ${cat}">${b}</span><span class="mouth"><span>거짓일 때</span></span><span class="bot"></span></span>`}
   return `<span class="blk ${shape} ${cat}">${parts}</span>`;
 }
+/* 조립된 프로그램: 문자열=블록, {c,body,els}=C자 블록 */
+function R(nodes){return nodes.map(n=>{
+  if(typeof n==='string')return n;
+  let h=`<span class="blk stack co ctop">${n.c}</span><div class="ind">${R(n.body)}</div>`;
+  if(n.els)h+=`<span class="blk stack co ctop">아니면</span><div class="ind">${R(n.els)}</div>`;
+  return h+'<div class="cap"></div>';
+}).join('')}
+const S=nodes=>`<div class="script">${R(nodes)}</div>`;
+
+/* 자주 쓰는 블록 */
+const HAT=B('hat','ev','프로그램이 시작되면');
+const PAIR=B('stack','mv','@move 이동 모터를 <A+B>로 설정');
+const WAIT=s=>B('stack','co',`[${s}] 초 기다리기`);
+const LOOP=body=>({c:'무한 반복하기',body});
+const IF=(cond,body,els)=>({c:`만약 ${cond} 라면`,body,els});
+const UNTIL=cond=>B('stack','co','$1 까지 기다리기',cond);
+const C_RED=B('bool','se','@color{C} 색상이 <빨간색> ?');
+const C_COL=c=>B('bool','se',`@color{C} 색상이 <${c}> ?`);
+const C_DARK=B('bool','se','@color{C} 반사광 <&lt;>[50]% ?');
+const D_NEAR=n=>B('bool','se',`@dist{D} 가 <&lt;>[${n}]<cm> 보다 가까운가?`);
+const F_PRESS=B('bool','se','@force{E} 가 <눌렸나> ?');
+const BTN_L=B('bool','se','@hub<왼쪽> 버튼이 <눌렸나> ?');
+const LAMP=c=>B('stack','li',`@light 버튼 불빛을 <${c}>으로 설정`);
+const BEEP=(n,s)=>B('stack','so',`@sound[${n}] 음을 [${s}]초 동안 비프음 재생`);
+const IMG=n=>B('stack','li',`@light<${n}> 켜기`);
+const CLR=B('stack','li','@light 픽셀 끄기');
+const STOP=B('stack','mv','@move 이동 정지');
 
 const DATA=[
  {id:'event',name:'이벤트',color:'--c-event',desc:'노란 모자 블록은 파이썬에서 "언제 시작할지"를 정하는 틀입니다.',rows:[
-  [B('hat','ev','프로그램이 시작되면'),'async def main():\n    # 여기에 코드를 씁니다\n\nrunloop.run(main())','모든 파이썬 프로그램의 기본 틀입니다. 블록 아래에 붙이는 내용이 main() 안으로 들어갑니다.'],
+  [HAT,'async def main():\n    # 여기에 코드를 씁니다\n\nrunloop.run(main())','모든 파이썬 프로그램의 기본 틀입니다. 블록 아래에 붙이는 내용이 main() 안으로 들어갑니다.'],
  ]},
  {id:'motor',name:'모터',color:'--c-motor',desc:'모터 하나를 따로 움직일 때 씁니다.',rows:[
   [B('stack','mo','@motor{A}<시계 방향 ↻>으로 [1] <회전> 실행'),'await motor.run_for_degrees(port.A, 360, 720)','(포트, 각도, 속도). 1회전 = 360°. 반시계 방향은 각도를 -360으로 씁니다.','unit'],
@@ -255,33 +300,45 @@ const DATA=[
   [B('stack','mo','@motor{A} 정지'),'motor.stop(port.A)',''],
   [B('stack','mo','@motor{A}<최단 경로>로 [0] 위치로 이동'),'await motor.run_to_absolute_position(port.A, 0, 720)','모터 표시 눈금(0~359) 기준 위치로 돌아갑니다.'],
   [B('stack','mo','@motor{A} 속도를 [75] %로 설정'),'SPEED = 750   # 이후 명령마다 속도로 넣기\nmotor.run(port.A, SPEED)','파이썬에는 "속도 설정"이 따로 없어서 명령마다 속도를 적습니다.','unit'],
-  [B('stack','mo','@motor{A} 상대 위치를 [0]으로 설정'),'motor.reset_relative_position(port.A, 0)',''],
-  [B('rep','mo','@motor{A} 상대 위치'),'motor.relative_position(port.A)','지금까지 돈 누적 각도(도).'],
+  [B('rep','mo','@motor{A} 위치'),'motor.absolute_position(port.A)','모터 눈금 기준 현재 각도.'],
   [B('rep','mo','@motor{A} 속도'),'motor.velocity(port.A)','블록은 %, 파이썬은 °/s 로 알려줍니다.','unit'],
  ]},
+ {id:'motorx',name:'모터 추가',ext:true,color:'--c-motor',desc:'확장 블록에서 추가하는 모터 기능. 상대 위치, 출력, 정지 방식, 가속률.',rows:[
+  [B('stack','mo','@motorx{A} 상대 위치 [0](으)로 [100]% 속도로 이동'),'await motor.run_to_relative_position(port.A, 0, 1000)','(포트, 상대 위치 각도, 속도). 상대 위치는 "0으로 설정"한 지점부터 센 각도입니다. 100% ≈ 1000°/s.','unit'],
+  [B('stack','mo','@motorx{A} 상대 위치를 [0](으)로 설정'),'motor.reset_relative_position(port.A, 0)','지금 위치를 0으로 정합니다. 블록의 줄자 0점 맞추기와 같아요.'],
+  [B('rep','mo','@motorx{A} 상대 위치'),'motor.relative_position(port.A)','0으로 설정한 뒤 돈 누적 각도(도). 두 바퀴 돌면 720.'],
+  [B('stack','mo','@motorx{A} 모터 [100]% 출력으로 켜기'),'motor.set_duty_cycle(port.A, 10000)','출력(듀티 사이클)은 -10000~10000. 50% → 5000. 속도를 맞추지 않고 힘을 그대로 보냅니다.','unit'],
+  [B('rep','mo','@motorx{A} 출력'),'motor.get_duty_cycle(port.A)','-10000~10000으로 나옵니다. ÷100 하면 블록의 %와 같아요.','unit'],
+  [B('stack','mo','@motorx{A} 정지 시 모터를 <브레이크>(으)로 설정'),'motor.stop(port.A, stop=motor.BRAKE)\n# 움직이는 명령에도 넣을 수 있어요\nawait motor.run_for_degrees(port.A, 360, 720, stop=motor.BRAKE)','파이썬은 "설정"이 따로 없고 명령마다 stop= 으로 정합니다. 브레이크=motor.BRAKE, 유지=motor.HOLD, 코스트(미끄러지듯 멈춤)=motor.COAST.'],
+  [B('stack','mo','@motorx{A} 가속률 <중간>(으)로 설정'),'await motor.run_for_degrees(port.A, 360, 720,\n    acceleration=1000, deceleration=1000)','가속률도 명령마다 acceleration=(°/s²)로 넣습니다. 1000을 "중간"으로 생각하고, 작을수록 부드럽게 출발·정지해요.','val'],
+ ]},
  {id:'move',name:'이동',color:'--c-move',desc:'바퀴 모터 두 개를 한 쌍으로 묶어 로봇을 움직입니다.',rows:[
-  [B('stack','mv','@move 이동 모터를 <A+B>로 설정'),'motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)','다른 이동 명령보다 먼저 한 번 써야 합니다.'],
+  [PAIR,'motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)','다른 이동 명령보다 먼저 한 번 써야 합니다.'],
   [B('stack','mv','@move <↑>[10]<cm> 이동'),'await motor_pair.move_for_degrees(motor_pair.PAIR_1, 205, 0)','파이썬은 cm 대신 바퀴 각도로 지정합니다. 작은 바퀴(지름 5.6cm)는 한 바퀴에 약 17.6cm → 10cm ≈ 205°.','unit'],
   [B('stack','mv','@move <↑>[1]<초> 이동'),'await motor_pair.move_for_time(motor_pair.PAIR_1, 1000, 0)','(쌍, 밀리초, 조향). 마지막 0은 "똑바로".','unit'],
   [B('stack','mv','@move <↑> 이동 시작'),'motor_pair.move(motor_pair.PAIR_1, 0)','두 번째 숫자는 조향(-100 왼쪽 ~ 100 오른쪽).'],
   [B('stack','mv','@move [30] 방향으로 이동 시작'),'motor_pair.move(motor_pair.PAIR_1, 30)',''],
-  [B('stack','mv','@move 왼쪽 [50]% 오른쪽 [50]%로 이동 시작'),'motor_pair.move_tank(motor_pair.PAIR_1, 500, 500)','바퀴 두 개의 속도를 따로 정합니다(°/s).','unit'],
-  [B('stack','mv','@move 이동 정지'),'motor_pair.stop(motor_pair.PAIR_1)',''],
+  [STOP,'motor_pair.stop(motor_pair.PAIR_1)',''],
  ]},
- {id:'light',name:'빛',color:'--c-light',desc:'허브 앞면 5×5 빛 매트릭스와 버튼 불빛.',rows:[
-  [B('stack','li','@light[Hello] 쓰기'),'light_matrix.write("Hello")','글자는 따옴표 안에 씁니다.'],
-  [B('stack','li','@light<웃는 얼굴> 켜기'),'light_matrix.show_image(light_matrix.IMAGE_HAPPY)','IMAGE_HEART, IMAGE_SAD 같은 이름으로 바꿀 수 있어요.'],
-  [B('stack','li','@light 픽셀 끄기'),'light_matrix.clear()',''],
+ {id:'movex',name:'이동 추가',ext:true,color:'--c-move',desc:'확장 블록에서 추가하는 이동 기능. 바퀴별 속도, 정지 방식, 가속률.',rows:[
+  [B('stack','mv','@move [50][50]%의 속도로 동작 시작하기'),'motor_pair.move_tank(motor_pair.PAIR_1, 500, 500)','(쌍, 왼쪽 속도, 오른쪽 속도) °/s. 두 바퀴 속도를 다르게 하면 꺾으면서 갑니다.','unit'],
+  [B('stack','mv','@move 정지 시 동작 모터를 <브레이크>(으)로 설정'),'motor_pair.stop(motor_pair.PAIR_1, stop=motor.BRAKE)','motor 모듈의 상수를 쓰므로 import motor 가 필요합니다. 이동 명령마다 stop= 을 넣어도 돼요.'],
+  [B('stack','mv','@move 이동 가속률 <중간>(으)로 설정'),'await motor_pair.move_for_degrees(motor_pair.PAIR_1, 360, 0,\n    velocity=500, acceleration=1000, deceleration=1000)','파이썬은 이동 명령마다 acceleration= 과 deceleration= 을 넣습니다.','val'],
+ ]},
+ {id:'light',name:'라이트',color:'--c-light',desc:'허브 앞면 5×5 라이트 매트릭스와 버튼 불빛.',rows:[
+  [B('stack','li','@light[Hello] 쓰기'),'await light_matrix.write("Hello")','글자는 따옴표 안에, 숫자는 str()로 글자로 바꿔서 씁니다.'],
+  [IMG('웃는 얼굴'),'light_matrix.show_image(light_matrix.IMAGE_HAPPY)','IMAGE_HEART, IMAGE_SAD 같은 이름으로 바꿀 수 있어요.'],
+  [CLR,'light_matrix.clear()',''],
   [B('stack','li','@light[1],[1] 픽셀을 [100]% 밝기로 켜기'),'light_matrix.set_pixel(0, 0, 100)','블록은 1부터, 파이썬은 0부터 셉니다!','unit'],
-  [B('stack','li','@light 버튼 불빛을 <빨간색>으로 설정'),'light.color(light.POWER, color.RED)',''],
+  [LAMP('빨간색'),'light.color(light.POWER, color.RED)',''],
  ]},
  {id:'sound',name:'소리',color:'--c-sound',desc:'허브 스피커로 비프음을 냅니다.',rows:[
-  [B('stack','so','@sound[60] 음을 [0.2]초 동안 비프음 재생'),'await sound.beep(262, 200, 100)','(주파수 Hz, 밀리초, 음량). 블록의 60번 음(가운데 도) ≈ 262Hz.','unit'],
+  [BEEP(60,0.2),'await sound.beep(262, 200, 100)','(주파수 Hz, 밀리초, 음량). 블록의 60번 음(가운데 도) ≈ 262Hz.','unit'],
   [B('stack','so','@sound 모든 소리 정지'),'sound.stop()',''],
   [B('stack','so','@sound 음량을 [50]%로 설정'),'sound.volume(50)',''],
  ]},
  {id:'control',name:'제어',color:'--c-control',desc:'C자 블록 안에 들어간 블록 = 파이썬에서 4칸 들여쓴 줄.',rows:[
-  [B('stack','co','[1] 초 기다리기'),'await runloop.sleep_ms(1000)','await 는 "끝날 때까지 기다려"라는 뜻입니다.','unit'],
+  [WAIT(1),'await runloop.sleep_ms(1000)','await 는 "끝날 때까지 기다려"라는 뜻입니다.','unit'],
   [B('c','co','[10] 번 반복하기'),'for i in range(10):\n    # 반복할 코드',''],
   [B('c','co','무한 반복하기'),'while True:\n    # 반복할 코드',''],
   [B('c','co','만약 ⬡ 라면'),'if 조건:\n    # 참일 때 코드',''],
@@ -291,92 +348,422 @@ const DATA=[
  ]},
  {id:'sensor',name:'센서',color:'--c-sensor',desc:'둥근 블록은 값을, 육각형 블록은 참/거짓을 돌려줍니다.',rows:[
   [B('rep','se','@color{C} 반사광'),'color_sensor.reflection(port.C)','0(어두움) ~ 100(밝음). 수업 첫 예시 블록입니다.','star'],
-  [B('bool','se','@color{C} 반사광 <&lt;>[50]% ?'),'color_sensor.reflection(port.C) < 50','육각형 블록 = 비교식. if 나 until 안에 넣어 씁니다.'],
+  [C_DARK,'color_sensor.reflection(port.C) < 50','육각형 블록 = 비교식. if 나 until 안에 넣어 씁니다.'],
   [B('rep','se','@color{C} 색상'),'color_sensor.color(port.C)','색 번호가 나옵니다. color.RED 같은 이름과 비교해요.'],
-  [B('bool','se','@color{C} 색상이 <빨간색> ?'),'color_sensor.color(port.C) == color.RED','같다는 비교는 = 가 아니라 == 두 개!'],
+  [C_RED,'color_sensor.color(port.C) == color.RED','같다는 비교는 = 가 아니라 == 두 개!'],
   [B('rep','se','@dist{D} 거리 <cm>'),'distance_sensor.distance(port.D)','mm 단위입니다. cm로 쓰려면 // 10. 감지 못 하면 -1.','unit'],
-  [B('bool','se','@dist{D} 가 <&lt;>[10]<cm> 보다 가까운가?'),'0 < distance_sensor.distance(port.D) < 100','-1(감지 안 됨)을 빼려고 0보다 큰지도 함께 봅니다.','unit'],
-  [B('bool','se','@force{E} 가 <눌렸나> ?'),'force_sensor.pressed(port.E)',''],
+  [D_NEAR(10),'0 < distance_sensor.distance(port.D) < 100','-1(감지 안 됨)을 빼려고 0보다 큰지도 함께 봅니다.','unit'],
+  [F_PRESS,'force_sensor.pressed(port.E)',''],
   [B('rep','se','@force{E} 압력 <%>'),'force_sensor.force(port.E)','0~100 (0.1뉴턴 단위, 100 = 10N).'],
   [B('rep','se','@hub<요> 각도'),'motion_sensor.tilt_angles()[0]','요·피치·롤 순서로 나오고 0.1도 단위입니다. 블록 값처럼 쓰려면 ÷10.','unit'],
   [B('stack','se','@hub 요 각도를 [0]으로 설정'),'motion_sensor.reset_yaw(0)',''],
-  [B('bool','se','@hub<왼쪽> 버튼이 <눌렸나> ?'),'button.pressed(button.LEFT) > 0','눌린 시간(ms)이 나오므로 0보다 크면 눌린 것입니다.'],
+  [BTN_L,'button.pressed(button.LEFT) > 0','눌린 시간(ms)이 나오므로 0보다 크면 눌린 것입니다.'],
  ]},
  {id:'op',name:'연산',color:'--c-op',desc:'계산과 비교 블록.',rows:[
   [B('rep','op','[1] 에서 [10] 사이의 난수'),'random.randint(1, 10)','맨 위에 import random 이 필요합니다.'],
-  [B('bool','op','[ ] &gt; [50]'),'값 > 50',''],
+  [B('bool','op','[] &gt; [50]'),'값 > 50',''],
   [B('bool','op','⬡ 그리고 ⬡'),'조건1 and 조건2',''],
   [B('bool','op','⬡ 이(가) 아니다'),'not 조건',''],
  ]},
 ];
 
-const KW=/\b(async|def|await|while|True|False|if|else|elif|for|in|range|import|from|not|and|or|lambda|return)\b/;
+/* ===== 예제 ===== */
+const PC={컬러센서:'--c-sensor',거리센서:'--c-sensor',힘센서:'--c-sensor',자이로:'--c-sensor',버튼:'--c-sensor',라이트:'--c-light',소리:'--c-sound',이동:'--c-move',모터:'--c-motor'};
+const EX=[
+ {g:'basic',t:'반사광 숫자 보기',use:['컬러센서','라이트'],goal:'컬러 센서 값을 라이트 매트릭스에 숫자로 띄워 봅니다. 흰 종이와 검은 선 위에 대 보며 숫자를 비교하세요.',
+  blk:[HAT,LOOP([B('stack','li','@light $1 쓰기',B('rep','se','@color{C} 반사광')),WAIT(0.5)])],
+  py:`from hub import port, light_matrix
+import color_sensor, runloop
+
+async def main():
+    while True:
+        await light_matrix.write(str(color_sensor.reflection(port.C)))
+        await runloop.sleep_ms(500)
+
+runloop.run(main())`,
+  ch:'숫자 대신, 50보다 작으면 "B"(검정) 크면 "W"(흰색)를 쓰도록 바꿔 보세요.'},
+ {g:'basic',t:'빨간색에서 멈추기',use:['컬러센서','이동'],goal:'앞으로 가다가 바닥에서 빨간색을 보면 멈춥니다.',
+  blk:[HAT,PAIR,B('stack','mv','@move <↑> 이동 시작'),UNTIL(C_RED),STOP],
+  py:`from hub import port
+import motor_pair, color_sensor, color, runloop
+
+async def main():
+    motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
+    motor_pair.move(motor_pair.PAIR_1, 0)
+    await runloop.until(lambda: color_sensor.color(port.C) == color.RED)
+    motor_pair.stop(motor_pair.PAIR_1)
+
+runloop.run(main())`,
+  ch:'멈춘 뒤에 웃는 얼굴을 켜 보세요.'},
+ {g:'basic',t:'거리 cm로 보기',use:['거리센서','라이트'],goal:'거리 센서가 잰 거리를 cm로 바꿔 화면에 띄웁니다.',
+  blk:[HAT,LOOP([B('stack','li','@light $1 쓰기',B('rep','se','@dist{D} 거리 <cm>')),WAIT(0.5)])],
+  py:`from hub import port, light_matrix
+import distance_sensor, runloop
+
+async def main():
+    while True:
+        cm = distance_sensor.distance(port.D) // 10   # mm → cm
+        await light_matrix.write(str(cm))
+        await runloop.sleep_ms(500)
+
+runloop.run(main())`,
+  ch:'아무것도 없을 때(-1) "?"를 쓰도록 if 를 넣어 보세요.'},
+ {g:'basic',t:'누르면 웃는 얼굴',use:['힘센서','라이트'],goal:'힘 센서를 누르고 있는 동안만 웃는 얼굴이 켜집니다.',
+  blk:[HAT,LOOP([IF(F_PRESS,[IMG('웃는 얼굴')],[CLR])])],
+  py:`from hub import port, light_matrix
+import force_sensor, runloop
+
+async def main():
+    while True:
+        if force_sensor.pressed(port.E):
+            light_matrix.show_image(light_matrix.IMAGE_HAPPY)
+        else:
+            light_matrix.clear()
+        await runloop.sleep_ms(50)
+
+runloop.run(main())`,
+  ch:'누르는 세기가 50% 넘으면 하트, 아니면 웃는 얼굴로 바꿔 보세요.'},
+ {g:'basic',t:'하트 5번 깜빡이기',use:['라이트'],goal:'정해진 횟수만큼 반복하는 방법을 익힙니다.',
+  blk:[HAT,{c:P('[5] 번 반복하기'),body:[IMG('하트'),WAIT(0.5),CLR,WAIT(0.5)]}],
+  py:`from hub import light_matrix
+import runloop
+
+async def main():
+    for i in range(5):
+        light_matrix.show_image(light_matrix.IMAGE_HEART)
+        await runloop.sleep_ms(500)
+        light_matrix.clear()
+        await runloop.sleep_ms(500)
+
+runloop.run(main())`,
+  ch:'깜빡이는 속도를 두 배 빠르게 바꿔 보세요.'},
+ {g:'basic',t:'버튼 불빛 신호등',use:['라이트'],goal:'허브 가운데 버튼 불빛으로 신호등을 만듭니다.',
+  blk:[HAT,LOOP([LAMP('초록색'),WAIT(2),LAMP('노란색'),WAIT(1),LAMP('빨간색'),WAIT(2)])],
+  py:`from hub import light
+import color, runloop
+
+async def main():
+    while True:
+        light.color(light.POWER, color.GREEN)
+        await runloop.sleep_ms(2000)
+        light.color(light.POWER, color.YELLOW)
+        await runloop.sleep_ms(1000)
+        light.color(light.POWER, color.RED)
+        await runloop.sleep_ms(2000)
+
+runloop.run(main())`,
+  ch:'빨간불일 때 라이트 매트릭스에 "STOP"을 같이 써 보세요.'},
+ {g:'basic',t:'도레미 연주',use:['소리'],goal:'블록의 음 번호를 파이썬의 주파수(Hz)로 바꿔 봅니다. 도=262, 레=294, 미=330.',
+  blk:[HAT,BEEP(60,0.5),BEEP(62,0.5),BEEP(64,0.5)],
+  py:`from hub import sound
+import runloop
+
+async def main():
+    await sound.beep(262, 500, 100)   # 도 (60)
+    await sound.beep(294, 500, 100)   # 레 (62)
+    await sound.beep(330, 500, 100)   # 미 (64)
+
+runloop.run(main())`,
+  ch:'파(65)=349Hz, 솔(67)=392Hz 를 더해 "도레미파솔"을 완성해 보세요.'},
+ {g:'basic',t:'버튼 누르면 삑',use:['버튼','소리'],goal:'허브 왼쪽 버튼을 누를 때마다 소리가 납니다.',
+  blk:[HAT,LOOP([UNTIL(BTN_L),BEEP(72,0.2)])],
+  py:`from hub import button, sound
+import runloop
+
+async def main():
+    while True:
+        await runloop.until(lambda: button.pressed(button.LEFT) > 0)
+        await sound.beep(523, 200, 100)   # 높은 도 (72)
+
+runloop.run(main())`,
+  ch:'오른쪽 버튼(button.RIGHT)을 누르면 낮은 소리가 나도록 더해 보세요.'},
+ {g:'basic',t:'모터 왔다 갔다',use:['모터'],goal:'모터를 한 바퀴씩 앞뒤로 계속 돌립니다.',
+  blk:[HAT,LOOP([B('stack','mo','@motor{A}<시계 방향 ↻>으로 [1] <회전> 실행'),B('stack','mo','@motor{A}<반시계 방향 ↺>으로 [1] <회전> 실행')])],
+  py:`from hub import port
+import motor, runloop
+
+async def main():
+    while True:
+        await motor.run_for_degrees(port.A, 360, 720)
+        await motor.run_for_degrees(port.A, -360, 720)
+
+runloop.run(main())`,
+  ch:'반 바퀴(180°)씩 움직이는 와이퍼로 바꿔 보세요.'},
+ {g:'basic',t:'제자리 90도 돌기',use:['자이로','이동'],goal:'허브의 요(yaw) 각도를 보며 정확히 90도만 돕니다.',
+  blk:[HAT,PAIR,B('stack','se','@hub 요 각도를 [0]으로 설정'),B('stack','mv','@move [100] 방향으로 이동 시작'),UNTIL(B('bool','op','$1 &gt; [90]',B('rep','se','@hub<요> 각도'))),STOP],
+  py:`from hub import port, motion_sensor
+import motor_pair, runloop
+
+async def main():
+    motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
+    motion_sensor.reset_yaw(0)
+    motor_pair.move(motor_pair.PAIR_1, 100, velocity=200)
+    # 0.1도 단위라 90도 = 900, 도는 방향에 따라 +/- 가 바뀌어 abs() 사용
+    await runloop.until(lambda: abs(motion_sensor.tilt_angles()[0]) > 900)
+    motor_pair.stop(motor_pair.PAIR_1)
+
+runloop.run(main())`,
+  ch:'4번 반복해서 사각형 모양으로 움직여 보세요. (앞으로 이동 + 90도 돌기)'},
+
+ {g:'mix',t:'라이트 + 소리: 누르면 축하',use:['힘센서','라이트','소리'],goal:'힘 센서를 누르면 하트, 빨간 불빛, 소리가 한꺼번에 나옵니다. 떼면 원래대로 돌아가요.',
+  blk:[HAT,LOOP([IF(F_PRESS,[IMG('하트'),LAMP('빨간색'),BEEP(72,0.2)],[CLR,LAMP('흰색')])])],
+  py:`from hub import port, light_matrix, light, sound
+import force_sensor, color, runloop
+
+async def main():
+    while True:
+        if force_sensor.pressed(port.E):
+            light_matrix.show_image(light_matrix.IMAGE_HEART)
+            light.color(light.POWER, color.RED)
+            await sound.beep(523, 200, 100)
+        else:
+            light_matrix.clear()
+            light.color(light.POWER, color.WHITE)
+        await runloop.sleep_ms(50)
+
+runloop.run(main())`,
+  ch:'누를 때 "도-미-솔" 세 음이 차례로 나오게 바꿔 보세요.'},
+ {g:'mix',t:'주차 경보기',use:['거리센서','라이트','소리'],goal:'가까울수록 불빛이 빨개지고 소리가 높고 빨라집니다. 블록의 "만약 안의 만약"은 파이썬의 elif 로 줄일 수 있어요.',
+  blk:[HAT,LOOP([IF(D_NEAR(10),[LAMP('빨간색'),BEEP(84,0.1)],[IF(D_NEAR(20),[LAMP('노란색'),BEEP(72,0.1),WAIT(0.3)],[LAMP('초록색')])])])],
+  py:`from hub import port, light, sound
+import distance_sensor, color, runloop
+
+async def main():
+    while True:
+        d = distance_sensor.distance(port.D)   # mm, 없으면 -1
+        if 0 < d < 100:
+            light.color(light.POWER, color.RED)
+            await sound.beep(1047, 100, 100)
+        elif 0 < d < 200:
+            light.color(light.POWER, color.YELLOW)
+            await sound.beep(523, 100, 100)
+            await runloop.sleep_ms(300)
+        else:
+            light.color(light.POWER, color.GREEN)
+            await runloop.sleep_ms(50)
+
+runloop.run(main())`,
+  ch:'라이트 매트릭스에 거리(cm)도 함께 보여 주세요.'},
+ {g:'mix',t:'색깔 피아노',use:['컬러센서','소리','라이트'],goal:'색깔 카드를 센서에 대면 색마다 다른 음과 불빛이 나옵니다.',
+  blk:[HAT,LOOP([IF(C_COL('빨간색'),[LAMP('빨간색'),BEEP(60,0.3)]),IF(C_COL('노란색'),[LAMP('노란색'),BEEP(64,0.3)]),IF(C_COL('파란색'),[LAMP('파란색'),BEEP(67,0.3)])])],
+  py:`from hub import port, light, sound
+import color_sensor, color, runloop
+
+async def main():
+    while True:
+        c = color_sensor.color(port.C)
+        if c == color.RED:
+            light.color(light.POWER, color.RED)
+            await sound.beep(262, 300, 100)   # 도
+        if c == color.YELLOW:
+            light.color(light.POWER, color.YELLOW)
+            await sound.beep(330, 300, 100)   # 미
+        if c == color.BLUE:
+            light.color(light.POWER, color.BLUE)
+            await sound.beep(392, 300, 100)   # 솔
+        await runloop.sleep_ms(20)
+
+runloop.run(main())`,
+  ch:'초록색(color.GREEN) 카드에 "레(294Hz)"를 추가해 보세요.'},
+ {g:'mix',t:'장애물 피하기',use:['거리센서','이동','소리'],goal:'앞으로 가다가 15cm 안에 물체가 있으면 멈추고, 소리를 낸 뒤 뒤로 갔다가 방향을 바꿉니다.',
+  blk:[HAT,PAIR,LOOP([B('stack','mv','@move <↑> 이동 시작'),UNTIL(D_NEAR(15)),STOP,BEEP(72,0.2),B('stack','mv','@move <↓>[1]<초> 이동'),B('stack','mv','@move <→>[0.7]<초> 이동')])],
+  py:`from hub import port, sound
+import motor_pair, distance_sensor, runloop
+
+async def main():
+    motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
+    while True:
+        motor_pair.move(motor_pair.PAIR_1, 0)
+        await runloop.until(lambda: 0 < distance_sensor.distance(port.D) < 150)
+        motor_pair.stop(motor_pair.PAIR_1)
+        await sound.beep(523, 200, 100)
+        await motor_pair.move_for_time(motor_pair.PAIR_1, 1000, 0, velocity=-360)   # 뒤로
+        await motor_pair.move_for_time(motor_pair.PAIR_1, 700, 100)                # 오른쪽 돌기
+
+runloop.run(main())`,
+  ch:'멈출 때 슬픈 얼굴(IMAGE_SAD)을 보여 주고, 다시 출발할 때 지워 보세요.'},
+ {g:'mix',t:'선 따라가다 빨간색 도착',use:['컬러센서','이동','라이트','소리'],goal:'검은 선을 따라가다가 빨간 도착 표시를 만나면 멈추고 축하합니다. 이동 추가 블록(바퀴별 속도)을 씁니다.',
+  blk:[HAT,PAIR,{c:P('$1 까지 반복하기',[C_RED]),body:[IF(C_DARK,[B('stack','mv','@move [20][50]%의 속도로 동작 시작하기')],[B('stack','mv','@move [50][20]%의 속도로 동작 시작하기')])]},STOP,IMG('웃는 얼굴'),BEEP(79,0.5)],
+  py:`from hub import port, light_matrix, sound
+import motor_pair, color_sensor, color, runloop
+
+async def main():
+    motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
+    while color_sensor.color(port.C) != color.RED:   # 빨간색이 될 때까지
+        if color_sensor.reflection(port.C) < 50:
+            motor_pair.move_tank(motor_pair.PAIR_1, 200, 500)
+        else:
+            motor_pair.move_tank(motor_pair.PAIR_1, 500, 200)
+        await runloop.sleep_ms(10)
+    motor_pair.stop(motor_pair.PAIR_1)
+    light_matrix.show_image(light_matrix.IMAGE_HAPPY)
+    await sound.beep(784, 500, 100)   # 솔 (79)
+
+runloop.run(main())`,
+  ch:'도착할 때까지 걸린 시간을 세서 화면에 보여 주세요. (힌트: 반복할 때마다 숫자 1씩 더하기)'},
+ {g:'mix',t:'누르는 만큼 돌기',use:['힘센서','모터'],goal:'힘 센서를 세게 누를수록 모터가 세게 돕니다. 모터 추가 블록(출력)을 씁니다.',
+  blk:[HAT,LOOP([B('stack','mo','@motorx{A} 모터 $1 % 출력으로 켜기',B('rep','se','@force{E} 압력 <%>'))])],
+  py:`from hub import port
+import motor, force_sensor, runloop
+
+async def main():
+    while True:
+        power = force_sensor.force(port.E) * 100   # 0~100 → 0~10000
+        motor.set_duty_cycle(port.A, power)
+        await runloop.sleep_ms(20)
+
+runloop.run(main())`,
+  ch:'누르는 세기를 라이트 매트릭스 막대(픽셀 개수)로도 보여 주세요.'},
+];
+
+/* ===== 코드 하이라이트 ===== */
+const KWS=new Set('async def await while True False if else elif for in range import from not and or lambda return'.split(' '));
 function hl(src){
   const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   return src.split('\n').map(line=>{
-    const tok=/(#.*$)|("[^"]*")|(\b\d+\b)|(\b[A-Za-z_]\w*\b)|([^#"\w]+|\w+)/g; let out='',m;
+    const tok=/(#.*$)|("[^"]*")|(\b\d+\b)|(\b[A-Za-z_]\w*\b)|([^#"\w]+)/g; let out='',m;
     while((m=tok.exec(line))){
       if(m[1])out+=`<span class="c">${esc(m[1])}</span>`;
       else if(m[2])out+=`<span class="s">${esc(m[2])}</span>`;
       else if(m[3])out+=`<span class="n">${m[3]}</span>`;
-      else if(m[4]){const w=m[4];const next=line[tok.lastIndex];
-        if(KW.test(w)&&w.match(KW)[0]===w)out+=`<span class="k">${w}</span>`;
-        else if(next==='(')out+=`<span class="f">${w}</span>`;
+      else if(m[4]){const w=m[4];
+        if(KWS.has(w))out+=`<span class="k">${w}</span>`;
+        else if(line[tok.lastIndex]==='(')out+=`<span class="f">${w}</span>`;
         else out+=w;}
-      else out+=esc(m[5]);
+      else if(m[5])out+=esc(m[5]);
+      else{tok.lastIndex++;}
     }
     return out;
   }).join('\n');
 }
-function codeBox(src){return `<div class="code"><pre>${hl(src)}</pre><button class="copy" type="button">복사</button></div>`}
+const codeBox=src=>`<div class="code"><pre>${hl(src)}</pre><button class="copy" type="button">복사</button></div>`;
+const pills=use=>`<div class="pills">${use.map(u=>`<span class="pill" style="--p:var(${PC[u]})">${u}</span>`).join('')}</div>`;
 
+/* ===== 대응표 ===== */
 const cats=document.getElementById('cats');
+const TAGS={unit:'<span class="tag">단위 주의</span>',star:'<span class="tag ok">예시</span>',val:'<span class="tag">예시값</span>'};
 cats.innerHTML=DATA.map(c=>`
 <section class="cat" data-cat="${c.id}">
-  <div class="cat-head"><span class="sw" style="background:var(${c.color})"></span><div><h2>${c.name}</h2><p class="muted">${c.desc}</p></div></div>
+  <div class="cat-head"><span class="sw" style="background:var(${c.color})${c.ext?';background-image:radial-gradient(#fff 2px,transparent 2.5px);background-size:9px 9px':''}"></span><div><h2>${c.name}${c.ext?'<span class="ext">확장</span>':''}</h2><p class="muted">${c.desc}</p></div></div>
   <div class="rows">${c.rows.map(([blk,py,note,flag])=>`
     <div class="row${flag==='star'?' star':''}">
       <div class="blk-cell">${blk}</div>
       ${codeBox(py)}
-      ${note?`<p class="note">${flag==='unit'?'<span class="tag">단위 주의</span>':flag==='star'?'<span class="tag ok">예시</span>':''}<span>${note}</span></p>`:''}
+      ${note?`<p class="note">${TAGS[flag]||''}<span>${note}</span></p>`:''}
     </div>`).join('')}</div>
 </section>`).join('');
 
-// 정적 코드 블록 하이라이트
 document.querySelectorAll('[data-hl]').forEach(el=>{
-  const raw=el.textContent; el.innerHTML=hl(raw);
+  el.innerHTML=hl(el.textContent);
   if(el.tagName==='PRE'){const b=document.createElement('button');b.className='copy';b.type='button';b.textContent='복사';el.parentNode.appendChild(b);}
 });
 document.querySelectorAll('[data-i]').forEach(el=>el.innerHTML=ICONS[el.dataset.i]);
 
-// 복사
 document.addEventListener('click',async e=>{
   const b=e.target.closest('.copy'); if(!b)return;
-  const text=b.parentNode.querySelector('pre').textContent;
-  try{await navigator.clipboard.writeText(text);b.textContent='복사됨';}
-  catch{const r=document.createRange();r.selectNodeContents(b.parentNode.querySelector('pre'));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='선택됨';}
+  const pre=b.parentNode.querySelector('pre');
+  try{await navigator.clipboard.writeText(pre.textContent);b.textContent='복사됨';}
+  catch{const r=document.createRange();r.selectNodeContents(pre);const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='선택됨';}
   setTimeout(()=>b.textContent='복사',1400);
 });
 
-// 필터
+const store={get(k,d){try{return localStorage.getItem(k)??d}catch{return d}},set(k,v){try{localStorage.setItem(k,v)}catch{}}};
 const fl=document.getElementById('filters');
 const all=[{id:'all',name:'전체'}].concat(DATA);
-let saved='all'; try{saved=localStorage.getItem('spike-cat')||'all'}catch{}
 fl.innerHTML=all.map(c=>`<button class="chip" type="button" id="chip-${c.id}" data-id="${c.id}" aria-pressed="false">${c.color?`<i style="background:var(${c.color})"></i>`:''}${c.name}</button>`).join('');
-function apply(id){
+function applyCat(id){
   fl.querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.id===id));
   cats.querySelectorAll('.cat').forEach(s=>s.hidden=!(id==='all'||s.dataset.cat===id));
-  try{localStorage.setItem('spike-cat',id)}catch{}
+  store.set('spike-cat',id);
 }
-fl.addEventListener('click',e=>{const b=e.target.closest('.chip');if(b)apply(b.dataset.id)});
-apply(DATA.some(d=>d.id===saved)?saved:'all');
+fl.addEventListener('click',e=>{const b=e.target.closest('.chip');if(b)applyCat(b.dataset.id)});
+const savedCat=store.get('spike-cat','all');
+applyCat(DATA.some(d=>d.id===savedCat)?savedCat:'all');
 
-// 연습 문제
+/* ===== 예제 모음 ===== */
+const GROUPS=[{id:'basic',name:'기본 예제'},{id:'mix',name:'응용: 센서 합치기'}];
+const exG=document.getElementById('exGroups'),exL=document.getElementById('exList'),exV=document.getElementById('exView');
+let curG=store.get('spike-exg','basic'); if(!GROUPS.some(g=>g.id===curG))curG='basic';
+let curE=null;
+exG.innerHTML=GROUPS.map(g=>`<button class="chip" type="button" id="exg-${g.id}" data-g="${g.id}" aria-pressed="false">${g.name} <span class="muted" style="font-weight:500">${EX.filter(e=>e.g===g.id).length}</span></button>`).join('');
+function showGroup(g){
+  curG=g;store.set('spike-exg',g);
+  exG.querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.g===g));
+  const list=EX.map((e,i)=>({e,i})).filter(x=>x.e.g===g);
+  exL.innerHTML=list.map(({e,i})=>`<button class="ex-item" type="button" id="exi-${i}" data-i="${i}" aria-current="false"><span>${e.t}</span><span class="dots">${e.use.map(u=>`<i style="background:var(${PC[u]})"></i>`).join('')}</span></button>`).join('');
+  showEx(list[0].i);
+}
+function showEx(i){
+  curE=i;const e=EX[i];
+  exL.querySelectorAll('.ex-item').forEach(b=>b.setAttribute('aria-current',+b.dataset.i===i));
+  exV.innerHTML=`<div class="card-head"><span class="eyebrow">${e.g==='mix'?'응용 예제':'기본 예제'}</span><h3>${e.t}</h3>${pills(e.use)}<p class="muted">${e.goal}</p></div>
+  <div class="duo"><div><p class="panel-label">블록</p>${S(e.blk)}</div><div><p class="panel-label">파이썬</p>${codeBox(e.py)}</div></div>
+  <p class="challenge"><b>바꿔 보기</b><span>${e.ch}</span></p>`;
+}
+exG.addEventListener('click',e=>{const b=e.target.closest('.chip');if(b)showGroup(b.dataset.g)});
+exL.addEventListener('click',e=>{const b=e.target.closest('.ex-item');if(b)showEx(+b.dataset.i)});
+showGroup(curG);
+
+/* ===== 조합 만들기 ===== */
+const TRIG=[
+ {id:'press',label:'힘센서를 누를 때',blk:F_PRESS,py:'force_sensor.pressed(port.E)',mods:['force_sensor']},
+ {id:'red',label:'컬러센서가 빨간색을 볼 때',blk:C_RED,py:'color_sensor.color(port.C) == color.RED',mods:['color_sensor','color']},
+ {id:'dark',label:'바닥이 어두울 때 (반사광 50% 미만)',blk:C_DARK,py:'color_sensor.reflection(port.C) < 50',mods:['color_sensor']},
+ {id:'near',label:'물체가 10cm보다 가까울 때',blk:D_NEAR(10),py:'0 < distance_sensor.distance(port.D) < 100',mods:['distance_sensor']},
+ {id:'btn',label:'허브 왼쪽 버튼을 누를 때',blk:BTN_L,py:'button.pressed(button.LEFT) > 0',hub:['button']},
+];
+const ACT=[
+ {id:'heart',label:'하트 켜기',c:'--c-light',hub:['light_matrix'],
+  on:[IMG('하트'),'light_matrix.show_image(light_matrix.IMAGE_HEART)'],off:[CLR,'light_matrix.clear()']},
+ {id:'lamp',label:'버튼 불빛 빨간색',c:'--c-light',hub:['light'],mods:['color'],
+  on:[LAMP('빨간색'),'light.color(light.POWER, color.RED)'],off:[LAMP('초록색'),'light.color(light.POWER, color.GREEN)']},
+ {id:'beep',label:'삑 소리',c:'--c-sound',hub:['sound'],
+  on:[BEEP(72,0.2),'await sound.beep(523, 200, 100)'],off:null},
+ {id:'motor',label:'모터 A 돌리기',c:'--c-motor',mods:['motor'],
+  on:[B('stack','mo','@motor{A}<시계 방향 ↻>으로 실행 시작'),'motor.run(port.A, 500)'],off:[B('stack','mo','@motor{A} 정지'),'motor.stop(port.A)']},
+ {id:'stop',label:'로봇 멈추기 (평소엔 앞으로)',c:'--c-move',mods:['motor_pair'],setup:[PAIR,'motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)'],
+  on:[STOP,'motor_pair.stop(motor_pair.PAIR_1)'],off:[B('stack','mv','@move <↑> 이동 시작'),'motor_pair.move(motor_pair.PAIR_1, 0)']},
+];
+const fT=document.getElementById('fTrig'),fA=document.getElementById('fAct'),fE=document.getElementById('fElse'),out=document.getElementById('buildOut');
+fT.insertAdjacentHTML('beforeend',TRIG.map((t,i)=>`<label class="opt"><input type="radio" name="trig" id="trig-${t.id}" value="${t.id}"${i===0?' checked':''}><i style="background:var(--c-sensor)"></i>${t.label}</label>`).join(''));
+fA.insertAdjacentHTML('beforeend',ACT.map(a=>`<label class="opt"><input type="checkbox" name="act" id="act-${a.id}" value="${a.id}"${a.id==='heart'||a.id==='beep'?' checked':''}><i style="background:var(${a.c})"></i>${a.label}</label>`).join(''));
+fE.insertAdjacentHTML('beforeend',`<label class="opt"><input type="radio" name="els" id="els-back" value="back" checked>원래대로 되돌리기</label><label class="opt"><input type="radio" name="els" id="els-none" value="none">아무것도 안 하기</label>`);
+
+function build(){
+  const t=TRIG.find(x=>x.id===document.querySelector('input[name=trig]:checked').value);
+  const acts=ACT.filter(a=>document.getElementById('act-'+a.id).checked);
+  const back=document.getElementById('els-back').checked;
+  if(!acts.length){out.innerHTML='<p class="muted">2번에서 출력을 하나 이상 골라 주세요.</p>';return;}
+  const hub=new Set(['port']),mods=new Set();
+  [t,...acts].forEach(x=>{(x.hub||[]).forEach(h=>hub.add(h));(x.mods||[]).forEach(m=>mods.add(m))});
+  mods.add('runloop');
+  const setups=acts.filter(a=>a.setup);
+  const offs=back?acts.filter(a=>a.off):[];
+  // 블록
+  const blk=[HAT,...setups.map(a=>a.setup[0]),LOOP([IF(t.blk,acts.map(a=>a.on[0]),offs.length?offs.map(a=>a.off[0]):undefined)])];
+  // 파이썬
+  const L=[`from hub import ${[...hub].join(', ')}`,`import ${[...mods].join(', ')}`,'','async def main():'];
+  setups.forEach(a=>L.push('    '+a.setup[1]));
+  L.push('    while True:',`        if ${t.py}:`);
+  acts.forEach(a=>L.push('            '+a.on[1]));
+  if(offs.length){L.push('        else:');offs.forEach(a=>L.push('            '+a.off[1]));}
+  L.push('        await runloop.sleep_ms(50)','','runloop.run(main())');
+  const use=[...new Set([{press:'힘센서',red:'컬러센서',dark:'컬러센서',near:'거리센서',btn:'버튼'}[t.id],...acts.map(a=>({heart:'라이트',lamp:'라이트',beep:'소리',motor:'모터',stop:'이동'}[a.id]))])];
+  out.innerHTML=`<div class="card-head"><span class="eyebrow">내가 만든 조합</span><p class="build-title">${t.label} → ${acts.map(a=>a.label.replace(/ \(.*\)/,'')).join(' + ')}</p>${pills(use)}</div>
+  <div class="duo"><div><p class="panel-label">블록</p>${S(blk)}</div><div><p class="panel-label">파이썬</p>${codeBox(L.join('\n'))}</div></div>
+  <p class="challenge"><b>살펴보기</b><span>고른 것에 따라 맨 위 import 줄이 어떻게 바뀌는지 보세요. 블록에는 없는 줄이지만 파이썬에서는 꼭 필요해요.</span></p>`;
+}
+document.querySelector('.picks').addEventListener('change',build);
+build();
+
+/* ===== 연습 문제 ===== */
 const Q=[
  [B('stack','mo','@motor{A}<시계 방향 ↻>으로 [2] <회전> 실행'),'await motor.run_for_degrees(port.A, 720, 720)','2회전 = 360 × 2 = 720°'],
- [B('stack','co','[0.5] 초 기다리기'),'await runloop.sleep_ms(500)','0.5초 = 500ms'],
+ [WAIT(0.5),'await runloop.sleep_ms(500)','0.5초 = 500ms'],
  [B('bool','se','@color{B} 반사광 <&gt;>[70]% ?'),'color_sensor.reflection(port.B) > 70','포트가 B로 바뀐 것에 주의'],
  [B('stack','li','@light[3],[3] 픽셀을 [100]% 밝기로 켜기'),'light_matrix.set_pixel(2, 2, 100)','가운데 픽셀. 1씩 빼서 0부터 세기'],
+ [B('stack','mo','@motorx{A} 모터 [50]% 출력으로 켜기'),'motor.set_duty_cycle(port.A, 5000)','출력 50% = 50 × 100 = 5000'],
+ [B('stack','mv','@move [30][60]%의 속도로 동작 시작하기'),'motor_pair.move_tank(motor_pair.PAIR_1, 300, 600)','% × 10 ≈ °/s. 오른쪽이 빨라서 왼쪽으로 꺾여요'],
 ];
 document.getElementById('quiz').innerHTML=Q.map(([b,py,why],i)=>`
 <div class="qcard"><div class="q"><b>문제 ${i+1}.</b> 이 블록을 파이썬 한 줄로 써 보세요.<div>${b}</div></div>
